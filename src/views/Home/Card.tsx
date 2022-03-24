@@ -79,7 +79,7 @@ export default function Card({
   const allTags = useTags();
   const allTagsObject = allTags ? _.transform(allTags, (obj, { id, name }) => (obj[id] = name), {} as any) : {};
   const tags = product.tags.map((tagID) => (
-    <Badge key={tagID} pill bg="primary" className="my-2 me-1">
+    <Badge key={tagID} pill bg="primary" className="me-1">
       {allTagsObject[tagID]}
     </Badge>
   ));
@@ -95,7 +95,9 @@ export default function Card({
               <CardComponent.Title>{product.name}</CardComponent.Title>
               <Text>{product.description}</Text>
 
+              <div className={tags.length === 0 ? "" : "mt-2"} />
               {tags}
+              <div className={tags.length === 0 ? "" : "mt-2"} />
 
               <p className="d-none d-md-block d-lg-none mb-1 mt-1">Stock: 5</p>
               <Row>
