@@ -105,7 +105,7 @@ export default function Card({
                   <Button>Nueva venta</Button>
                 </Col>
                 <Col className="d-sm-flex d-md-none d-lg-flex justify-content-end">
-                  <p className="text-end mt-0 mb-0 h-auto">Stock: 5</p>
+                  <p className="text-end mt-0 mb-0 h-auto">Stock: {product.stock}</p>
                 </Col>
               </Row>
             </div>
