@@ -3,7 +3,8 @@ import { useRef } from "react";
 import CardPlaceholder from "./CardPlaceholder";
 import Product from "../../../types/product.type";
 import { useTags } from "../../../context/tagsAndCategoriesContext";
-import { Col, Row, Card as CardComponent, Badge } from "react-bootstrap";
+import randomNumberInterval from "../../../utils/randomNumberInterval";
+import { Col, Row, Card as CardComponent, Badge, Placeholder } from "react-bootstrap";
 import { BadgesDiv, Button, CardComponentM, Container, Price } from "./CardComponents";
 
 export default function Card({
@@ -17,11 +18,17 @@ export default function Card({
 }) {
   const allTags = useTags();
   const allTagsObject = allTags ? _.transform(allTags, (obj, { id, name }) => (obj[id] = name), {} as any) : {};
-  const tags = product.tags.map((tagID) => (
-    <Badge key={tagID} pill bg="primary" className="me-1">
-      {allTagsObject[tagID]}
-    </Badge>
-  ));
+  const tags = product.tags.map((tagID) =>
+    allTagsObject[tagID] ? (
+      <Badge key={tagID} pill bg="primary" className="me-1">
+        {allTagsObject[tagID]}
+      </Badge>
+    ) : (
+      <Placeholder animation="glow">
+        <Placeholder style={{ borderRadius: 5 }} xs={randomNumberInterval(2, 4)} bg="primary" />{" "}
+      </Placeholder>
+    )
+  );
 
   const stockRowRef = useRef() as any;
   const handleCardClick = () => {
