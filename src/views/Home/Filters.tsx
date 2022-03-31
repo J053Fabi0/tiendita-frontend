@@ -1,6 +1,8 @@
 import React from "react";
 import styled from "@emotion/styled";
-import { Col, Spinner } from "react-bootstrap";
+import { Col, Placeholder } from "react-bootstrap";
+import StyledProp from "../../types/styledProp.type";
+import randomNumberInterval from "../../utils/randomNumberInterval";
 import { useTagsAndCategories } from "../../context/tagsAndCategoriesContext";
 
 const FiltersBar = styled.div(({ theme: { colors } }: any) => ({
@@ -16,7 +18,7 @@ const FiltersBar = styled.div(({ theme: { colors } }: any) => ({
   "*": { marginBottom: 0 },
 }));
 
-const FiltersContainer = styled(({ className, children }: { className?: string; children: any }) => (
+const FiltersContainer = styled(({ className, children }: StyledProp) => (
   <Col className={className} xs={3}>
     <FiltersBar>{children}</FiltersBar>
   </Col>
@@ -39,12 +41,6 @@ const Tag = styled.a({
   ":hover": { color: "black", cursor: "pointer", fontWeight: "bold" },
 });
 
-const SpinnerDiv = styled(({ className }: { className?: string }) => (
-  <Col xs={12} className={className + " d-flex align-items-center justify-content-center"}>
-    <Spinner animation="border" variant="secondary" />
-  </Col>
-))({ paddingRight: 20, paddingTop: 10 });
-
 export default function Filters() {
   const tagsAndCategories = useTagsAndCategories();
   const filtersTree: Array<any> = [];
@@ -57,5 +53,27 @@ export default function Filters() {
       for (let i = 0; i < tags.length; i++) filtersTree.push(<Tag key={tags[i].name}>{tags[i].name}</Tag>);
     }
 
-  return <FiltersContainer>{tagsAndCategories ? filtersTree : <SpinnerDiv />}</FiltersContainer>;
+  return (
+    <FiltersContainer>
+      {tagsAndCategories
+        ? filtersTree
+        : new Array(3).fill(0).map((_, i) => {
+            const items = [];
+            const numberItems = randomNumberInterval(3, 5);
+            for (let i = 0; i < numberItems; i++)
+              items.push(<Placeholder key={i} xs={randomNumberInterval(7, 9)} bg="secondary" />);
+
+            return (
+              <>
+                <Placeholder key={"title"} as={Category} animation="glow">
+                  <Placeholder xs={randomNumberInterval(7, 9)} />
+                </Placeholder>
+                <Placeholder as={Tag} animation="glow">
+                  {items}
+                </Placeholder>
+              </>
+            );
+          })}
+    </FiltersContainer>
+  );
 }
