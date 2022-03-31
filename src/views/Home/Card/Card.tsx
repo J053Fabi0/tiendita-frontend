@@ -24,7 +24,7 @@ export default function Card({
         {allTagsObject[tagID]}
       </Badge>
     ) : (
-      <Placeholder animation="glow">
+      <Placeholder key={tagID} animation="glow">
         <Placeholder style={{ borderRadius: 5 }} xs={randomNumberInterval(2, 4)} bg="primary" />{" "}
       </Placeholder>
     )
