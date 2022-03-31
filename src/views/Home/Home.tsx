@@ -34,7 +34,7 @@ export default function Home() {
         <Row>
           <Filters />
           <Col>
-            <Row>{tagsAndCategories === null && products === null ? loadingCards : cards}</Row>
+            <Row>{tagsAndCategories === null || products === null ? loadingCards : cards}</Row>
           </Col>
         </Row>
       </Container>
