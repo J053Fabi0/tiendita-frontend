@@ -1,4 +1,4 @@
-import Card from "./Card";
+import Card from "./Card/Card";
 import Filters from "./Filters";
 import { Fragment } from "react";
 import Product from "../../types/product.type";
