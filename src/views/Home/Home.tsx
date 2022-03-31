@@ -1,15 +1,13 @@
 import Card from "./Card/Card";
-import Filters from "./Filters";
 import { Fragment } from "react";
+import Filters from "./Filters/Filters";
 import Product from "../../types/product.type";
 import { Row, Col, Container } from "react-bootstrap";
 import useNewSaleModal from "../../hooks/useNewSaleModal";
 import { useProducts } from "../../context/productsContext";
-import { useTagsAndCategories } from "../../context/tagsAndCategoriesContext";
 
 export default function Home() {
   const products = useProducts();
-  const tagsAndCategories = useTagsAndCategories();
   const loadingCards = Array(6)
     .fill(0)
     .map((_, i) => <Card key={i} loading={true}></Card>);
@@ -34,7 +32,7 @@ export default function Home() {
         <Row>
           <Filters />
           <Col>
-            <Row>{tagsAndCategories === null || products === null ? loadingCards : cards}</Row>
+            <Row>{products === null ? loadingCards : cards}</Row>
           </Col>
         </Row>
       </Container>
