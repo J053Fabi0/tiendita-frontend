@@ -8,11 +8,13 @@ const AllCenteredDiv = styled.div({
   alignItems: "center",
 });
 
-const ButtonColored = styled(({ className, children }: { className?: string; children?: any }) => (
-  <Button variant="outline-light" className={className}>
-    {children}
-  </Button>
-))(({ theme: { colors } }: any) => ({
+const ButtonColored = styled(
+  ({ className, children, onClick = () => 1 }: { className?: string; children?: any; onClick?: () => any }) => (
+    <Button variant="outline-light" className={className} onClick={onClick}>
+      {children}
+    </Button>
+  )
+)(({ theme: { colors } }: any) => ({
   "backgroundColor": colors.buttonColor,
   "borderColor": colors.buttonColor,
   "color": colors.buttonText,

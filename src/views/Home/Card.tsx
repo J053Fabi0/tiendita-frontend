@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { useRef } from "react";
 import styled from "@emotion/styled";
 import Product from "../../types/product.type";
 import StyledProp from "../../types/styledProp.type";
@@ -54,17 +55,27 @@ const Text = styled(({ className, children }: StyledProp) => (
   "@media (max-width: 767px)": { WebkitLineClamp: maxLines, height: "auto" },
 }));
 
-const Button = styled(({ className, children }: StyledProp) => (
-  <CardButton className={className + " d-none d-md-inline-block"}>{children}</CardButton>
+const Button = styled(({ className, children, onClick }: any) => (
+  <CardButton onClick={onClick} className={className + " d-none d-md-inline-block"}>
+    {children}
+  </CardButton>
 ))({
   height: lineHeight * buttonHeightInLines + "em",
 });
 
+const BadgesDiv = styled.div`
+  overflow: auto;
+  height: 25.5px;
+  max-height: 25.5px;
+`;
+
 export default function Card({
   product = { description: "", name: "", price: 1, stock: 1, id: 1, tags: [] },
+  handleOnClick = () => undefined,
   loading,
 }: {
   product?: Product;
+  handleOnClick?: (a: Product) => void;
   loading?: boolean | undefined;
 }) {
   const allTags = useTags();
@@ -75,10 +86,15 @@ export default function Card({
     </Badge>
   ));
 
+  const stockRowRef = useRef() as any;
+  const handleCardClick = () => {
+    if (stockRowRef.current.children[0].clientHeight === 0) handleOnClick(product);
+  };
+
   return (
     <Container>
       <CardComponentM>
-        <Col>
+        <Col onClick={handleCardClick}>
           <CardComponent.Body className="h-100">
             {loading ? (
               <>
@@ -114,13 +130,13 @@ export default function Card({
                 <Text>{product.description}</Text>
 
                 <div className="mt-2" />
-                {tags.length === 0 ? <Badge className="invisible">.</Badge> : tags}
+                <BadgesDiv>{tags.length === 0 ? <Badge className="invisible">.</Badge> : tags}</BadgesDiv>
                 <div className="mt-2" />
 
                 <p className="d-none d-md-block d-lg-none mb-1 mt-1">Stock: 5</p>
-                <Row>
+                <Row ref={stockRowRef}>
                   <Col xs={12} sm={12} md={12} lg={7}>
-                    <Button>Nueva venta</Button>
+                    <Button onClick={() => handleOnClick(product)}>Nueva venta</Button>
                   </Col>
                   <Col className="d-sm-flex d-md-none d-lg-flex justify-content-end">
                     <p className="text-end mt-0 mb-0 h-auto">Stock: {product.stock}</p>

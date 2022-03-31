@@ -1,7 +1,9 @@
 import Card from "./Card";
 import Filters from "./Filters";
 import { Fragment } from "react";
+import Product from "../../types/product.type";
 import { Row, Col, Container } from "react-bootstrap";
+import useNewSaleModal from "../../hooks/useNewSaleModal";
 import { useProducts } from "../../context/productsContext";
 import { useTagsAndCategories } from "../../context/tagsAndCategoriesContext";
 
@@ -12,7 +14,18 @@ export default function Home() {
     .fill(0)
     .map((_, i) => <Card key={i} loading={true}></Card>);
 
-  const cards = products?.map((product) => <Card key={product.id} product={product} />);
+  const { modal: NewSaleModal, setShow, show, setProduct } = useNewSaleModal();
+
+  const handleOnClick = (product: Product) => {
+    if (show === false) {
+      setProduct(product);
+      setShow(true);
+    }
+  };
+
+  const cards = products?.map((product) => (
+    <Card key={product.id} product={product} handleOnClick={handleOnClick} />
+  ));
 
   return (
     <Fragment>
@@ -25,6 +38,7 @@ export default function Home() {
           </Col>
         </Row>
       </Container>
+      {NewSaleModal}
     </Fragment>
   );
 }

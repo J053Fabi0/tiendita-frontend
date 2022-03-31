@@ -1,4 +1,4 @@
-import React from "react";
+import { Fragment } from "react";
 import styled from "@emotion/styled";
 import { Col, Placeholder } from "react-bootstrap";
 import StyledProp from "../../types/styledProp.type";
@@ -64,14 +64,14 @@ export default function Filters() {
               items.push(<Placeholder key={i} xs={randomNumberInterval(7, 9)} bg="secondary" />);
 
             return (
-              <>
+              <Fragment key={i}>
                 <Placeholder key={"title"} as={Category} animation="glow">
                   <Placeholder xs={randomNumberInterval(7, 9)} />
                 </Placeholder>
                 <Placeholder as={Tag} animation="glow">
                   {items}
                 </Placeholder>
-              </>
+              </Fragment>
             );
           })}
     </FiltersContainer>
