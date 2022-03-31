@@ -6,6 +6,7 @@ import StyledProp from "../../types/styledProp.type";
 import { useTags } from "../../context/tagsAndCategoriesContext";
 import { AllCenteredDiv, ButtonColored as CardButton } from "../../styles/mixins";
 import { Col, Row, Card as CardComponent, Badge, Placeholder } from "react-bootstrap";
+import randomNumberInterval from "../../utils/randomNumberInterval";
 
 const Container = styled(
   AllCenteredDiv.withComponent(({ className, children }: StyledProp) => (
@@ -34,10 +35,10 @@ const CardComponentM = styled(({ className, children }: StyledProp) => (
 }));
 
 const lineHeight = 1.2;
-const maxLines = 2;
+const maxLines = 1;
 const buttonHeightInLines = 2;
 
-const Text = styled(({ className, children }: StyledProp) => (
+const Price = styled(({ className, children }: StyledProp) => (
   <CardComponent.Text className={className + " mb-0"}>{children}</CardComponent.Text>
 ))(() => ({
   "overflow": "hidden",
@@ -99,18 +100,17 @@ export default function Card({
             {loading ? (
               <>
                 <Placeholder as={CardComponent.Title} animation="glow">
-                  <Placeholder xs={12} />
+                  <Placeholder xs={randomNumberInterval(8, 12)} />
                 </Placeholder>
-                <Placeholder as={Text} animation="glow">
-                  <Placeholder xs={7} bg="secondary" /> <Placeholder xs={4} bg="secondary" />{" "}
-                  <Placeholder xs={4} bg="secondary" /> <Placeholder xs={6} bg="secondary" />{" "}
-                  <Placeholder xs={8} bg="secondary" />
+
+                <Placeholder as={Price} animation="glow">
+                  <Placeholder xs={randomNumberInterval(2, 4)} bg="secondary" />
                 </Placeholder>
 
                 <div className="mt-2" />
                 <Placeholder animation="glow">
-                  <Placeholder style={{ borderRadius: 5 }} xs={3} bg="primary" />{" "}
-                  <Placeholder style={{ borderRadius: 5 }} xs={4} bg="primary" />
+                  <Placeholder style={{ borderRadius: 5 }} xs={randomNumberInterval(2, 4)} bg="primary" />{" "}
+                  <Placeholder style={{ borderRadius: 5 }} xs={randomNumberInterval(2, 4)} bg="primary" />
                 </Placeholder>
                 <div className="mt-2" />
 
@@ -127,7 +127,7 @@ export default function Card({
             ) : (
               <>
                 <CardComponent.Title>{product.name}</CardComponent.Title>
-                <Text>{product.description}</Text>
+                <Price>${product.price}</Price>
 
                 <div className="mt-2" />
                 <BadgesDiv>{tags.length === 0 ? <Badge className="invisible">.</Badge> : tags}</BadgesDiv>
