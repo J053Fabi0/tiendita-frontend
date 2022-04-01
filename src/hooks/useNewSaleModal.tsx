@@ -1,8 +1,8 @@
-import { useReducer, useState } from "react";
+import { useReducer } from "react";
 import DatePicker from "react-date-picker";
 import Product from "../types/product.type";
 import { ButtonColored } from "../styles/mixins";
-import { Button, Modal, Form, InputGroup, FormControl } from "react-bootstrap";
+import { Modal, Form, InputGroup, FormControl } from "react-bootstrap";
 
 const ACTIONS = Object.freeze({
   SET_SHOW: "set_show",
@@ -10,7 +10,6 @@ const ACTIONS = Object.freeze({
   SET_TIME: "set_time",
   SET_PRODUCT: "set_product",
   SET_QUANTITY: "set_quantity",
-  SET_SHOWED_QUANTITY: "set_showed_quantity",
 } as const);
 
 interface State {
@@ -18,8 +17,10 @@ interface State {
   date: Date;
   time: Date;
   product?: Product | undefined;
-  quantity: number;
-  showedQuantity: string;
+  quantity: {
+    realValue: number;
+    showedValue: string;
+  };
 }
 interface SetDate {
   type: "set_date";
@@ -39,13 +40,12 @@ interface SetProduct {
 }
 interface SetQuantity {
   type: "set_quantity";
-  quantity: number;
+  quantity: {
+    realValue: number;
+    showedValue: string;
+  };
 }
-interface SetShowedQuantity {
-  type: "set_showed_quantity";
-  showedQuantity: string;
-}
-type Action = SetDate | SetTime | SetShow | SetProduct | SetQuantity | SetShowedQuantity;
+type Action = SetDate | SetTime | SetShow | SetProduct | SetQuantity;
 
 function reducer(state: State, action: Action) {
   switch (action.type) {
@@ -63,8 +63,6 @@ function reducer(state: State, action: Action) {
 
     case ACTIONS.SET_QUANTITY:
       return { ...state, quantity: action.quantity };
-    case ACTIONS.SET_SHOWED_QUANTITY:
-      return { ...state, showedQuantity: action.showedQuantity };
 
     default:
       return state;
@@ -76,24 +74,23 @@ export default function NewSaleModal() {
     show: false,
     date: new Date(),
     time: new Date(),
-    quantity: 1,
-    showedQuantity: "1",
+    quantity: { showedValue: "1", realValue: 1 },
   });
 
   const handleClose = () => dispatch({ type: ACTIONS.SET_SHOW, show: false });
   const handleQuantityChange = (a: any) => {
     const newValueString = (a.target.value as string).replace(/\./g, "");
-    const newValue = parseInt(newValueString);
+    const newValue = +newValueString;
 
-    console.log({ newValue, newValueString, quantity: state.quantity, showedQuantity: state.showedQuantity });
     if (newValueString === "") {
-      dispatch({ type: ACTIONS.SET_QUANTITY, quantity: 0 });
-      dispatch({ type: ACTIONS.SET_SHOWED_QUANTITY, showedQuantity: "" });
+      dispatch({ type: ACTIONS.SET_QUANTITY, quantity: { realValue: 0, showedValue: "" } });
     } else {
       if (isNaN(newValue)) return;
       if (newValue < 0) return;
-      dispatch({ type: ACTIONS.SET_QUANTITY, quantity: newValue });
-      dispatch({ type: ACTIONS.SET_SHOWED_QUANTITY, showedQuantity: newValue.toString() });
+      dispatch({
+        type: ACTIONS.SET_QUANTITY,
+        quantity: { realValue: newValue, showedValue: newValue.toString() },
+      });
     }
   };
 
@@ -110,13 +107,13 @@ export default function NewSaleModal() {
             </Modal.Title>
           </Modal.Header>
 
-          <Modal.Body>
-            <Form>
+          <Form>
+            <Modal.Body>
               <Form.Group className="mb-1" controlId="formCantidad">
                 <Form.Label>Cantidad</Form.Label>
                 <InputGroup className="mb-3">
                   {/* <InputGroup.Text>$</InputGroup.Text> */}
-                  <FormControl type="text" value={state.showedQuantity} onChange={handleQuantityChange} />
+                  <FormControl type="text" value={state.quantity.showedValue} onChange={handleQuantityChange} />
                 </InputGroup>
               </Form.Group>
 
@@ -126,15 +123,12 @@ export default function NewSaleModal() {
                   <DatePicker />
                 </InputGroup>
               </Form.Group>
-              <ButtonColored type="submit">Nueva venta</ButtonColored>
-            </Form>
-          </Modal.Body>
+            </Modal.Body>
 
-          <Modal.Footer>
-            <Button variant="secondary" onClick={handleClose}>
-              Cerrar
-            </Button>
-          </Modal.Footer>
+            <Modal.Footer>
+              <ButtonColored type="submit">Nueva venta</ButtonColored>
+            </Modal.Footer>
+          </Form>
         </Modal>
       ),
   };
