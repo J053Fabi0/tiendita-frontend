@@ -1,6 +1,6 @@
 import Card from "./Card/Card";
-import { Fragment, useCallback } from "react";
 import Filters from "./Filters/Filters";
+import { Fragment, useCallback } from "react";
 import Product from "../../types/product.type";
 import { Row, Col, Container } from "react-bootstrap";
 import useNewSaleModal from "../../hooks/useNewSaleModal";

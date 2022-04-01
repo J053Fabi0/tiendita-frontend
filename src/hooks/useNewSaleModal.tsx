@@ -149,7 +149,7 @@ export default function NewSaleModal() {
                       value={state.date}
                       format={"y-MM-dd"}
                       maxDate={new Date()}
-                      onChange={(v: Date) => dispatch({ type: ACTIONS.SET_DATE, date: v })}
+                      onChange={(v: Date | null) => v !== null && dispatch({ type: ACTIONS.SET_DATE, date: v })}
                     />
                   </InputGroup>
                 </Form.Group>
@@ -161,16 +161,16 @@ export default function NewSaleModal() {
                     <TimePicker
                       format="hh-mm a"
                       maxTime={
-                        ((a = new Date()) =>
-                          a.getFullYear() === state.date.getFullYear() &&
-                          a.getMonth() === state.date.getMonth() &&
-                          a.getDate() === state.date.getDate())()
+                        ((a = new Date(), b = state.date) =>
+                          a.getFullYear() === b.getFullYear() &&
+                          a.getMonth() === b.getMonth() &&
+                          a.getDate() === b.getDate())()
                           ? getTimeInFormat()
                           : undefined
                       }
                       value={state.time}
                       disableClock={true}
-                      onChange={(v) => dispatch({ type: ACTIONS.SET_TIME, time: v.toString() })}
+                      onChange={(v) => v !== null && dispatch({ type: ACTIONS.SET_TIME, time: v.toString() })}
                     />
                   </InputGroup>
                 </Form.Group>

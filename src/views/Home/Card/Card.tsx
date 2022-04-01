@@ -2,6 +2,7 @@ import _ from "lodash";
 import { memo, useRef } from "react";
 import CardPlaceholder from "./CardPlaceholder";
 import Product from "../../../types/product.type";
+import useMediaQuery from "../../../hooks/useMediaQuery";
 import { useTags } from "../../../context/tagsAndCategoriesContext";
 import randomNumberInterval from "../../../utils/randomNumberInterval";
 import { Col, Row, Card as CardComponent, Badge, Placeholder } from "react-bootstrap";

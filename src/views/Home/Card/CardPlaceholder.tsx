@@ -1,9 +1,12 @@
 import { memo } from "react";
 import { BadgesDiv, Price } from "./CardComponents";
+import useBreakpoints from "../../../hooks/useBreakpoints";
 import { Placeholder, Row, Col, Card } from "react-bootstrap";
 import randomNumberInterval from "../../../utils/randomNumberInterval";
 
 function CardPlaceholder() {
+  const { lessThan } = useBreakpoints();
+
   return (
     <>
       <Placeholder as={Card.Title} animation="glow">
@@ -27,11 +30,13 @@ function CardPlaceholder() {
         <Placeholder xs={4} />
       </Placeholder>
 
-      <Row>
-        <Col xs={12} sm={12} md={12} lg={7}>
-          <Placeholder.Button variant="primary" xs={12} />
-        </Col>
-      </Row>
+      {lessThan.small ? null : (
+        <Row>
+          <Col xs={12} sm={12} md={12} lg={7}>
+            <Placeholder.Button variant="primary" xs={12} />
+          </Col>
+        </Row>
+      )}
     </>
   );
 }
