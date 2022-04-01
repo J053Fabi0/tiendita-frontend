@@ -104,9 +104,9 @@ export default function NewSaleModal() {
   };
 
   return {
-    setProduct: (newProduct: Product) => dispatch({ type: ACTIONS.SET_PRODUCT, product: newProduct }),
-    setShow: (newValue: boolean) => dispatch({ type: ACTIONS.SET_SHOW, show: newValue }),
     show: state.show,
+    setShow: (newValue: boolean) => dispatch({ type: ACTIONS.SET_SHOW, show: newValue }),
+    setProduct: (newProduct: Product) => dispatch({ type: ACTIONS.SET_PRODUCT, product: newProduct }),
     modal:
       state.product === undefined ? null : (
         <Modal show={state.show && Boolean(state.product)} onHide={handleClose} centered size="lg">
@@ -118,6 +118,8 @@ export default function NewSaleModal() {
 
           <Form>
             <Modal.Body>
+              {state.product.description ? <p>{state.product.description}</p> : null}
+
               {/* Quantity */}
               <Form.Group className="mb-1" controlId="formCantidad">
                 <Form.Label>Cantidad</Form.Label>
