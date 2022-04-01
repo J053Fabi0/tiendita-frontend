@@ -1,5 +1,5 @@
 import Card from "./Card/Card";
-import { Fragment } from "react";
+import { Fragment, useCallback } from "react";
 import Filters from "./Filters/Filters";
 import Product from "../../types/product.type";
 import { Row, Col, Container } from "react-bootstrap";
@@ -14,12 +14,12 @@ export default function Home() {
 
   const { modal: NewSaleModal, setShow, show, setProduct } = useNewSaleModal();
 
-  const handleOnClick = (product: Product) => {
+  const handleOnClick = useCallback((product: Product) => {
     if (show === false) {
       setProduct(product);
       setShow(true);
     }
-  };
+  }, []);
 
   const cards = products?.map((product) => (
     <Card key={product.id} product={product} handleOnClick={handleOnClick} />

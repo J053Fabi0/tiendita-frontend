@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { useRef } from "react";
+import { memo, useRef } from "react";
 import CardPlaceholder from "./CardPlaceholder";
 import Product from "../../../types/product.type";
 import { useTags } from "../../../context/tagsAndCategoriesContext";
@@ -7,7 +7,7 @@ import randomNumberInterval from "../../../utils/randomNumberInterval";
 import { Col, Row, Card as CardComponent, Badge, Placeholder } from "react-bootstrap";
 import { BadgesDiv, Button, CardComponentM, Container, Price } from "./CardComponents";
 
-export default function Card({
+function Card({
   loading,
   handleOnClick = () => undefined,
   product = { description: "", name: "", price: 1, stock: 1, id: 1, tags: [] },
@@ -68,3 +68,5 @@ export default function Card({
     </Container>
   );
 }
+
+export default memo(Card);
