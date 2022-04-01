@@ -13,10 +13,19 @@ export function TagsAndCategoriesProvider(a: { children: any }) {
   const [tagsAndCategories, setTagsAndCategories] = useState<null | Category[]>(null);
   const [tags, setTags] = useState<null | Tag[]>(null);
 
-  useEffect(
-    () => void http.get<{ message: Category[] }>("/tags").then((a) => setTagsAndCategories(a.data.message)),
-    []
-  );
+  useEffect(() => {
+    (async () => {
+      let message: null | Category[] = null;
+      while (message === null)
+        try {
+          message = (await http.get<{ message: Category[] }>("/tags")).data.message;
+        } catch (e) {
+          console.error(e);
+        }
+
+      setTagsAndCategories(message);
+    })();
+  }, []);
   useEffect(() => {
     if (tagsAndCategories === null) return;
     setTags(tagsAndCategories.map((a) => a.tags).flat());
