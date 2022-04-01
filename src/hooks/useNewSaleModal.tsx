@@ -51,16 +51,17 @@ interface Reset {
   type: "reset";
 }
 type Action = SetDate | SetTime | SetShow | SetProduct | SetQuantity | Reset;
-const defaultValues = (): Omit<State, "show"> => {
+const getTimeInFormat = (date = new Date()) => {
   const nowDate = new Date();
   const hours = nowDate.getHours();
   const minutes = nowDate.getMinutes();
-  return {
-    date: nowDate,
-    quantity: { showedValue: "1", realValue: 1 },
-    time: `${hours <= 9 ? "0" : ""}${hours}:${minutes <= 9 ? "0" : ""}${minutes}`,
-  };
+  return `${hours <= 9 ? "0" : ""}${hours}:${minutes <= 9 ? "0" : ""}${minutes}`;
 };
+const defaultValues = (): Omit<State, "show"> => ({
+  date: new Date(),
+  quantity: { showedValue: "1", realValue: 1 },
+  time: getTimeInFormat(),
+});
 
 function reducer(state: State, action: Action) {
   switch (action.type) {
@@ -159,6 +160,14 @@ export default function NewSaleModal() {
                   <InputGroup className="mb-3">
                     <TimePicker
                       format="hh-mm a"
+                      maxTime={
+                        ((a = new Date()) =>
+                          a.getFullYear() === state.date.getFullYear() &&
+                          a.getMonth() === state.date.getMonth() &&
+                          a.getDate() === state.date.getDate())()
+                          ? getTimeInFormat()
+                          : undefined
+                      }
                       value={state.time}
                       disableClock={true}
                       onChange={(v) => dispatch({ type: ACTIONS.SET_TIME, time: v.toString() })}
