@@ -63,6 +63,10 @@ const BadgesDiv = styled.div`
   overflow: auto;
   height: 33px; // 25.5
   max-height: 33px;
+  @media screen and (max-width: 767px) {
+    height: auto;
+    max-height: 58px;
+  }
 `;
 
 export { Container, CardComponentM, Price, Button, BadgesDiv };
