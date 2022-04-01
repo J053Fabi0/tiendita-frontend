@@ -1,8 +1,9 @@
 import FiltersPlaceholder from "./FiltersPlaceholder";
 import { Category, FiltersContainer, Tag } from "./FiltersComponets";
 import { useTagsAndCategories } from "../../../context/tagsAndCategoriesContext";
+import { memo } from "react";
 
-export default function Filters() {
+function Filters() {
   const tagsAndCategories = useTagsAndCategories();
   const filtersTree: Array<any> = [];
 
@@ -16,3 +17,5 @@ export default function Filters() {
 
   return <FiltersContainer>{tagsAndCategories ? filtersTree : <FiltersPlaceholder />}</FiltersContainer>;
 }
+
+export default memo(Filters);
