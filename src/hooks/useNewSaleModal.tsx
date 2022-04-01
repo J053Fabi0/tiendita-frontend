@@ -1,8 +1,9 @@
-import { useEffect, useReducer, useRef } from "react";
+import TimePicker from "react-time-picker";
 import DatePicker from "react-date-picker";
 import Product from "../types/product.type";
 import { ButtonColored } from "../styles/mixins";
-import { Modal, Form, InputGroup, FormControl } from "react-bootstrap";
+import { useEffect, useReducer, useRef } from "react";
+import { Modal, Form, InputGroup, FormControl, Row, Col } from "react-bootstrap";
 
 const ACTIONS = Object.freeze({
   SET_SHOW: "set_show",
@@ -16,7 +17,7 @@ const ACTIONS = Object.freeze({
 interface State {
   show: boolean;
   date: Date;
-  time: Date;
+  time: string;
   product?: Product | undefined;
   quantity: {
     realValue: number;
@@ -29,7 +30,7 @@ interface SetDate {
 }
 interface SetTime {
   type: "set_time";
-  time: Date;
+  time: string;
 }
 interface SetShow {
   type: "set_show";
@@ -50,7 +51,16 @@ interface Reset {
   type: "reset";
 }
 type Action = SetDate | SetTime | SetShow | SetProduct | SetQuantity | Reset;
-const defaultValues = () => ({ date: new Date(), time: new Date(), quantity: { showedValue: "1", realValue: 1 } });
+const defaultValues = (): Omit<State, "show"> => {
+  const nowDate = new Date();
+  const hours = nowDate.getHours();
+  const minutes = nowDate.getMinutes();
+  return {
+    date: nowDate,
+    quantity: { showedValue: "1", realValue: 1 },
+    time: `${hours <= 9 ? "0" : ""}${hours}:${minutes <= 9 ? "0" : ""}${minutes}`,
+  };
+};
 
 function reducer(state: State, action: Action) {
   switch (action.type) {
@@ -129,18 +139,33 @@ export default function NewSaleModal() {
                 </InputGroup>
               </Form.Group>
 
-              {/* Date */}
-              <Form.Group className="mb-1" controlId="formFecha">
-                <Form.Label>Fecha</Form.Label>
-                <InputGroup className="mb-3">
-                  <DatePicker
-                    value={state.date}
-                    format={"y-MM-dd"}
-                    maxDate={new Date()}
-                    onChange={(v: Date) => dispatch({ type: ACTIONS.SET_DATE, date: v })}
-                  />
-                </InputGroup>
-              </Form.Group>
+              <Row>
+                {/* Date */}
+                <Form.Group as={Col} className="mb-1" controlId="formFecha">
+                  <Form.Label>Fecha</Form.Label>
+                  <InputGroup className="mb-3">
+                    <DatePicker
+                      value={state.date}
+                      format={"y-MM-dd"}
+                      maxDate={new Date()}
+                      onChange={(v: Date) => dispatch({ type: ACTIONS.SET_DATE, date: v })}
+                    />
+                  </InputGroup>
+                </Form.Group>
+
+                {/* Time */}
+                <Form.Group as={Col} className="mb-1 me-4" controlId="formFecha">
+                  <Form.Label>Tiempo</Form.Label>
+                  <InputGroup className="mb-3">
+                    <TimePicker
+                      format="hh-mm a"
+                      value={state.time}
+                      disableClock={true}
+                      onChange={(v) => dispatch({ type: ACTIONS.SET_TIME, time: v.toString() })}
+                    />
+                  </InputGroup>
+                </Form.Group>
+              </Row>
             </Modal.Body>
 
             <Modal.Footer>
