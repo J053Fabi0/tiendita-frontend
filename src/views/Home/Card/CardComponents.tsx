@@ -52,7 +52,7 @@ const Price = styled(({ className, children }: StyledProp) => (
 }));
 
 const Button = styled(({ className, children, onClick }: any) => (
-  <CardButton onClick={onClick} className={className + " d-none d-md-inline-block"}>
+  <CardButton onClick={onClick} className={className}>
     {children}
   </CardButton>
 ))({
