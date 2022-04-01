@@ -109,6 +109,7 @@ export default function NewSaleModal() {
 
           <Form>
             <Modal.Body>
+              {/* Quantity */}
               <Form.Group className="mb-1" controlId="formCantidad">
                 <Form.Label>Cantidad</Form.Label>
                 <InputGroup className="mb-3">
@@ -117,10 +118,16 @@ export default function NewSaleModal() {
                 </InputGroup>
               </Form.Group>
 
+              {/* Date */}
               <Form.Group className="mb-1" controlId="formFecha">
                 <Form.Label>Fecha</Form.Label>
                 <InputGroup className="mb-3">
-                  <DatePicker />
+                  <DatePicker
+                    value={state.date}
+                    format={"y-MM-dd"}
+                    maxDate={new Date()}
+                    onChange={(v: Date) => dispatch({ type: ACTIONS.SET_DATE, date: v })}
+                  />
                 </InputGroup>
               </Form.Group>
             </Modal.Body>
