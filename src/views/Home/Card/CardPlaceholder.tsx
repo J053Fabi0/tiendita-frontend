@@ -5,7 +5,7 @@ import randomNumberInterval from "../../../utils/randomNumberInterval";
 import useBreakpoints from "../../../hooks/useBreakpoints";
 
 function CardPlaceholder() {
-  const { lessThan } = useBreakpoints();
+  const { lessOrEqualThan } = useBreakpoints();
 
   return (
     <>
@@ -30,7 +30,7 @@ function CardPlaceholder() {
         <Placeholder xs={4} />
       </Placeholder>
 
-      {lessThan.small ? null : (
+      {lessOrEqualThan.small ? null : (
         <Row>
           <Col xs={12} sm={12} md={12} lg={7}>
             <Placeholder.Button variant="primary" xs={12} />

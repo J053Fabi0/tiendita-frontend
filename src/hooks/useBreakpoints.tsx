@@ -2,7 +2,7 @@ import useMediaQuery from "./useMediaQuery";
 
 const useBreakpoints = () => {
   const toReturn = {
-    lessThan: {
+    lessOrEqualThan: {
       xSmall: useMediaQuery("(max-width: 575px)", true),
       small: useMediaQuery("(max-width: 767px)", true),
       medium: useMediaQuery("(max-width: 991px)", true),
@@ -10,7 +10,7 @@ const useBreakpoints = () => {
       xLarge: useMediaQuery("(max-width: 1399px)", true),
       xxLarge: true,
     },
-    greaterThan: {
+    greaterOrEqualThan: {
       xSmall: true,
       small: useMediaQuery("(min-width: 576px)", true),
       medium: useMediaQuery("(min-width: 768px)", true),
@@ -23,12 +23,12 @@ const useBreakpoints = () => {
   return {
     ...toReturn,
     on: {
-      xSmall: toReturn.lessThan.xSmall,
-      small: toReturn.lessThan.small && toReturn.greaterThan.small,
-      medium: toReturn.lessThan.medium && toReturn.greaterThan.medium,
-      large: toReturn.lessThan.large && toReturn.greaterThan.large,
-      xLarge: toReturn.lessThan.xLarge && toReturn.greaterThan.xLarge,
-      xxLarge: toReturn.lessThan.xxLarge && toReturn.greaterThan.xxLarge,
+      xSmall: toReturn.lessOrEqualThan.xSmall,
+      small: toReturn.lessOrEqualThan.small && toReturn.greaterOrEqualThan.small,
+      medium: toReturn.lessOrEqualThan.medium && toReturn.greaterOrEqualThan.medium,
+      large: toReturn.lessOrEqualThan.large && toReturn.greaterOrEqualThan.large,
+      xLarge: toReturn.lessOrEqualThan.xLarge && toReturn.greaterOrEqualThan.xLarge,
+      xxLarge: toReturn.lessOrEqualThan.xxLarge && toReturn.greaterOrEqualThan.xxLarge,
     },
   };
 };
