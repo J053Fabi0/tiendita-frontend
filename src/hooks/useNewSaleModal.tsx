@@ -1,4 +1,4 @@
-import { useReducer } from "react";
+import { useEffect, useReducer, useRef } from "react";
 import DatePicker from "react-date-picker";
 import Product from "../types/product.type";
 import { ButtonColored } from "../styles/mixins";
@@ -10,6 +10,7 @@ const ACTIONS = Object.freeze({
   SET_TIME: "set_time",
   SET_PRODUCT: "set_product",
   SET_QUANTITY: "set_quantity",
+  RESET: "reset",
 } as const);
 
 interface State {
@@ -45,7 +46,11 @@ interface SetQuantity {
     showedValue: string;
   };
 }
-type Action = SetDate | SetTime | SetShow | SetProduct | SetQuantity;
+interface Reset {
+  type: "reset";
+}
+type Action = SetDate | SetTime | SetShow | SetProduct | SetQuantity | Reset;
+const defaultValues = () => ({ date: new Date(), time: new Date(), quantity: { showedValue: "1", realValue: 1 } });
 
 function reducer(state: State, action: Action) {
   switch (action.type) {
@@ -64,18 +69,22 @@ function reducer(state: State, action: Action) {
     case ACTIONS.SET_QUANTITY:
       return { ...state, quantity: action.quantity };
 
+    case ACTIONS.RESET:
+      return { ...state, ...defaultValues() };
+
     default:
       return state;
   }
 }
 
 export default function NewSaleModal() {
-  const [state, dispatch] = useReducer(reducer, {
-    show: false,
-    date: new Date(),
-    time: new Date(),
-    quantity: { showedValue: "1", realValue: 1 },
-  });
+  const [state, dispatch] = useReducer(reducer, { show: false, ...defaultValues() });
+
+  // Only reset the state if the product is different from the last one
+  const lastProduct = useRef(state.product);
+  useEffect(() => {
+    if (lastProduct.current !== state.product) dispatch({ type: ACTIONS.RESET });
+  }, [state.product]);
 
   const handleClose = () => dispatch({ type: ACTIONS.SET_SHOW, show: false });
   const handleQuantityChange = (a: any) => {
