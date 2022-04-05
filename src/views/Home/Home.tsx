@@ -14,12 +14,15 @@ export default function Home() {
 
   const { modal: NewSaleModal, setShow, show, setProduct } = useNewSaleModal();
 
-  const handleOnClick = useCallback((product: Product) => {
-    if (show === false) {
-      setProduct(product);
-      setShow(true);
-    }
-  }, []);
+  const handleOnClick = useCallback(
+    (product: Product) => {
+      if (show === false) {
+        setProduct(product);
+        setShow(true);
+      }
+    },
+    [setProduct, setShow, show]
+  );
 
   const cards = products?.map((product) => (
     <Card key={product.id} product={product} handleOnClick={handleOnClick} />

@@ -116,6 +116,12 @@ export default function NewSaleModal() {
 
   return {
     show: state.show,
+    date: (() => {
+      const newDate = new Date(state.date);
+      const [hour, minute] = state.time.split(":").map((s) => parseInt(s));
+      newDate.setHours(hour, minute, 0, 0);
+      return newDate;
+    })(),
     setShow: (newValue: boolean) => dispatch({ type: ACTIONS.SET_SHOW, show: newValue }),
     setProduct: (newProduct: Product) => dispatch({ type: ACTIONS.SET_PRODUCT, product: newProduct }),
     modal:
