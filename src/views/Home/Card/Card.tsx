@@ -5,8 +5,8 @@ import Product from "../../../types/product.type";
 import useBreakpoints from "../../../hooks/useBreakpoints";
 import { useTags } from "../../../context/tagsAndCategoriesContext";
 import randomNumberInterval from "../../../utils/randomNumberInterval";
-import { Col, Row, Card as CardComponent, Badge, Placeholder } from "react-bootstrap";
-import { BadgesDiv, Button, CardComponentM, Container, Price } from "./CardComponents";
+import { BadgesDiv, CardComponentM, Container, Price } from "./CardComponents";
+import { Col, Row, Card as CardComponent, Badge, Placeholder, Button } from "react-bootstrap";
 
 function Card({
   loading,
@@ -21,7 +21,7 @@ function Card({
   const allTagsObject = allTags ? _.transform(allTags, (obj, { id, name }) => (obj[id] = name), {} as any) : {};
   const tags = product.tags.map((tagID) =>
     allTagsObject[tagID] ? (
-      <Badge key={tagID} pill bg="primary" className="me-1">
+      <Badge key={tagID} pill bg="secondary" className="me-1">
         {allTagsObject[tagID]}
       </Badge>
     ) : (

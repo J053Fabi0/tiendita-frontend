@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import StyledProp from "../../../types/styledProp.type";
+import { AllCenteredDiv } from "../../../styles/mixins";
 import { Col, Card as CardComponent } from "react-bootstrap";
-import { AllCenteredDiv, ButtonColored as CardButton } from "../../../styles/mixins";
 
 const Container = styled(
   AllCenteredDiv.withComponent(({ className, children }: StyledProp) => (
@@ -51,14 +51,6 @@ const Price = styled(({ className, children }: StyledProp) => (
   "@media (max-width: 767px)": { WebkitLineClamp: maxLines, height: "auto" },
 }));
 
-const Button = styled(({ className, children, onClick }: any) => (
-  <CardButton onClick={onClick} className={className}>
-    {children}
-  </CardButton>
-))({
-  height: lineHeight * buttonHeightInLines + "em",
-});
-
 const BadgesDiv = styled.div`
   overflow: auto;
   height: 33px; // 25.5
@@ -69,4 +61,4 @@ const BadgesDiv = styled.div`
   }
 `;
 
-export { Container, CardComponentM, Price, Button, BadgesDiv };
+export { Container, CardComponentM, Price, BadgesDiv };
