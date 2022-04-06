@@ -12,7 +12,7 @@ export default function Home() {
     .fill(0)
     .map((_, i) => <Card key={i} loading={true}></Card>);
 
-  const { modal: NewSaleModal, setShow, show, setProduct } = useNewSaleModal();
+  const { modal: NewSaleModal, setShow, show, setProduct, sale } = useNewSaleModal();
 
   const handleOnClick = useCallback(
     (product: Product) => {

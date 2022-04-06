@@ -13,6 +13,7 @@ const ACTIONS = Object.freeze({
   SET_PRODUCT: "set_product",
   SET_QUANTITY: "set_quantity",
   SET_SPECIAL_PRICE: "set_special_price",
+  SET_CASH: "set_cash",
   RESET: "reset",
 } as const);
 
@@ -28,6 +29,12 @@ interface State {
   specialPrice: {
     exists: boolean;
     total: boolean;
+    realValue: number;
+    showedValue: string;
+  };
+  cash: {
+    exists: boolean;
+    zeroCash: boolean;
     realValue: number;
     showedValue: string;
   };
@@ -67,22 +74,36 @@ interface SetSpecialPrice {
     showedValue?: string;
   };
 }
-type Action = SetDate | SetTime | SetShow | SetProduct | SetQuantity | Reset | SetSpecialPrice;
+interface SetCash {
+  type: "set_cash";
+  cash: {
+    exists?: boolean;
+    zeroCash?: boolean;
+    realValue?: number;
+    showedValue?: string;
+  };
+}
+type Action = SetDate | SetTime | SetShow | SetProduct | SetQuantity | Reset | SetSpecialPrice | SetCash;
 const getTimeInFormat = (date = new Date()) => {
-  const nowDate = new Date();
-  const hours = nowDate.getHours();
-  const minutes = nowDate.getMinutes();
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
   return `${hours <= 9 ? "0" : ""}${hours}:${minutes <= 9 ? "0" : ""}${minutes}`;
 };
-const defaultValues = (product?: Product): Omit<State, "show"> => ({
+const defaultValues = (): Omit<State, "show"> => ({
   date: new Date(),
   quantity: { showedValue: "1", realValue: 1 },
   time: getTimeInFormat(),
   specialPrice: {
     exists: false,
     total: true,
-    realValue: product ? product.price : 1,
-    showedValue: product ? product.price.toString() : "1",
+    realValue: 0,
+    showedValue: "",
+  },
+  cash: {
+    exists: false,
+    zeroCash: true,
+    realValue: 0,
+    showedValue: "",
   },
 });
 
@@ -110,10 +131,13 @@ function reducer(state: State, action: Action) {
       return { ...state, quantity: action.quantity };
 
     case ACTIONS.RESET:
-      return { ...state, ...defaultValues(state.product) };
+      return { ...state, ...defaultValues() };
 
     case ACTIONS.SET_SPECIAL_PRICE:
       return { ...state, specialPrice: { ...state.specialPrice, ...action.specialPrice } };
+
+    case ACTIONS.SET_CASH:
+      return { ...state, cash: { ...state.cash, ...action.cash } };
 
     default:
       return state;
@@ -131,34 +155,49 @@ export default function NewSaleModal() {
 
   const handleClose = () => dispatch({ type: ACTIONS.SET_SHOW, show: false });
 
-  const handleNumberChange = (a: any, type: any, valueName: any) => {
-    const newValueString = (a.target.value as string).replace(/\./g, "");
+  const handleNumberChange = (a: any, type: any, valueName: any, { forceInteger = false } = {}) => {
+    const newValueString = a.target.value.toString().replace(forceInteger ? /\./g : /(?<=\..*)\./g, "");
     const newValue = +newValueString;
 
     if (newValueString === "") {
       dispatch({ type, [valueName]: { realValue: 0, showedValue: "" } });
     } else if (!(isNaN(newValue) || newValue < 0)) {
-      dispatch({ type, [valueName]: { realValue: newValue, showedValue: newValue.toString() } });
+      dispatch({ type, [valueName]: { realValue: newValue, showedValue: newValueString } });
     }
   };
-  const handleQuantityChange = (a: any) => handleNumberChange(a, ACTIONS.SET_QUANTITY, "quantity");
+  const handleQuantityChange = (a: any) =>
+    handleNumberChange(a, ACTIONS.SET_QUANTITY, "quantity", { forceInteger: true });
   const handleSpecialPriceChange = (a: any) => handleNumberChange(a, ACTIONS.SET_SPECIAL_PRICE, "specialPrice");
+  const handleCashChange = (a: any) => handleNumberChange(a, ACTIONS.SET_CASH, "cash");
 
   const { medium } = useBreakpoints().lessOrEqualThan;
 
   return {
-    show: state.show,
-    date: (() => {
-      const newDate = new Date(state.date);
-      const [hour, minute] = state.time.split(":").map((s) => parseInt(s));
-      newDate.setHours(hour, minute, 0, 0);
-      return newDate;
+    sale: (() => {
+      const a: { quantity: number; cash: number; date: Date; specialPrice?: number } = {
+        quantity: state.quantity.realValue,
+        cash: (() => {
+          if (!state.cash.exists) return (state.product?.price ?? 0) * state.quantity.realValue;
+          return state.cash.zeroCash ? 0 : state.cash.realValue;
+        })(),
+        date: (() => {
+          const newDate = new Date(state.date);
+          const [hour, minute] = state.time.split(":").map((s) => parseInt(s));
+          newDate.setHours(hour, minute, 0, 0);
+          return newDate;
+        })(),
+      };
+      if (state.specialPrice.exists)
+        a.specialPrice = state.specialPrice.realValue * (state.specialPrice.total ? 1 : state.quantity.realValue);
+      return a;
     })(),
+
+    show: state.show,
     setShow: (newValue: boolean) => dispatch({ type: ACTIONS.SET_SHOW, show: newValue }),
     setProduct: (newProduct: Product) => dispatch({ type: ACTIONS.SET_PRODUCT, product: newProduct }),
     modal:
       state.product === undefined ? null : (
-        <Modal show={state.show && Boolean(state.product)} onHide={handleClose} centered size="lg">
+        <Modal show={state.show && !!state.product} onHide={handleClose} centered size="lg">
           <Modal.Header closeButton>
             <Modal.Title>
               {state.product.name} - ${state.product.price}
@@ -184,6 +223,7 @@ export default function NewSaleModal() {
                   <Form.Label>Fecha</Form.Label>
                   <InputGroup className="mb-3">
                     <DatePicker
+                      required={true}
                       value={state.date}
                       format={"y-MM-dd"}
                       maxDate={new Date()}
@@ -197,6 +237,7 @@ export default function NewSaleModal() {
                   <Form.Label>Tiempo</Form.Label>
                   <InputGroup className="mb-3">
                     <TimePicker
+                      required={true}
                       format="hh-mm a"
                       maxTime={
                         ((a = new Date(), b = state.date) =>
@@ -214,11 +255,60 @@ export default function NewSaleModal() {
                 </Form.Group>
               </Row>
 
+              {/* Pago con tarjeta */}
+              <Form.Group className="mb-1" controlId="formPagoTarjeta">
+                <Form.Label>Pago total con tarjeta</Form.Label>
+                <InputGroup className="mb-3">
+                  <ButtonGroup style={{ zIndex: 0 }}>
+                    <Button
+                      variant={state.cash.exists ? "secondary" : "danger"}
+                      onClick={() => dispatch({ type: ACTIONS.SET_CASH, cash: { exists: false } })}
+                    >
+                      No
+                    </Button>
+                    <Button
+                      variant={state.cash.exists ? "success" : "secondary"}
+                      onClick={() => dispatch({ type: ACTIONS.SET_CASH, cash: { exists: true } })}
+                    >
+                      Sí
+                    </Button>
+                  </ButtonGroup>
+                  {state.cash.exists ? (
+                    <Fragment>
+                      <ButtonGroup style={{ zIndex: 0 }} className={medium ? "mt-2 w-100" : "ms-2"}>
+                        <Button
+                          variant={state.cash.zeroCash ? "primary" : "secondary"}
+                          onClick={() => dispatch({ type: ACTIONS.SET_CASH, cash: { zeroCash: true } })}
+                        >
+                          Todo
+                        </Button>
+                        <Button
+                          variant={state.cash.zeroCash ? "secondary" : "primary"}
+                          onClick={() => dispatch({ type: ACTIONS.SET_CASH, cash: { zeroCash: false } })}
+                        >
+                          Algo en efectivo
+                        </Button>
+
+                        {state.cash.zeroCash ? null : (
+                          <FormControl
+                            type="text"
+                            placeholder="¿Cuánto fue en efectivo?"
+                            onChange={handleCashChange}
+                            value={state.cash.showedValue}
+                            style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
+                          />
+                        )}
+                      </ButtonGroup>
+                    </Fragment>
+                  ) : null}
+                </InputGroup>
+              </Form.Group>
+
               {/* Special price */}
               <Form.Group className="mb-1" controlId="formPrecioEspecial">
-                <Form.Label>Precio especial</Form.Label>
+                <Form.Label>Precio especial / descuento</Form.Label>
                 <InputGroup className="mb-3">
-                  <ButtonGroup style={{ zIndex: 0 }} aria-label="Basic example">
+                  <ButtonGroup style={{ zIndex: 0 }}>
                     <Button
                       variant={state.specialPrice.exists ? "secondary" : "danger"}
                       onClick={() =>
@@ -236,11 +326,7 @@ export default function NewSaleModal() {
                   </ButtonGroup>
                   {state.specialPrice.exists ? (
                     <Fragment>
-                      <ButtonGroup
-                        style={{ zIndex: 0 }}
-                        aria-label="Basic example"
-                        className={medium ? "mt-2 w-100" : "ms-2"}
-                      >
+                      <ButtonGroup style={{ zIndex: 0 }} className={medium ? "mt-2 w-100" : "ms-2"}>
                         <Button
                           variant={state.specialPrice.total ? "primary" : "secondary"}
                           onClick={() =>
@@ -260,6 +346,7 @@ export default function NewSaleModal() {
 
                         <FormControl
                           type="text"
+                          placeholder="0"
                           onChange={handleSpecialPriceChange}
                           value={state.specialPrice.showedValue}
                           style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
