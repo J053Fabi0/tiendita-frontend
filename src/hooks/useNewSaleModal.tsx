@@ -1,10 +1,10 @@
 import TimePicker from "react-time-picker";
 import DatePicker from "react-date-picker";
 import Product from "../types/product.type";
+import useBreakpoints from "./useBreakpoints";
 import { ButtonColored } from "../styles/mixins";
 import { Fragment, useEffect, useReducer, useRef } from "react";
 import { Modal, Form, InputGroup, FormControl, Row, Col, Button, ButtonGroup } from "react-bootstrap";
-import useBreakpoints from "./useBreakpoints";
 
 const ACTIONS = Object.freeze({
   SET_SHOW: "set_show",
@@ -218,7 +218,7 @@ export default function NewSaleModal() {
               <Form.Group className="mb-1" controlId="formPrecioEspecial">
                 <Form.Label>Precio especial</Form.Label>
                 <InputGroup className="mb-3">
-                  <ButtonGroup aria-label="Basic example">
+                  <ButtonGroup style={{ zIndex: 0 }} aria-label="Basic example">
                     <Button
                       variant={state.specialPrice.exists ? "secondary" : "danger"}
                       onClick={() =>
@@ -236,7 +236,11 @@ export default function NewSaleModal() {
                   </ButtonGroup>
                   {state.specialPrice.exists ? (
                     <Fragment>
-                      <ButtonGroup aria-label="Basic example" className={medium ? "mt-2 w-100" : "ms-2"}>
+                      <ButtonGroup
+                        style={{ zIndex: 0 }}
+                        aria-label="Basic example"
+                        className={medium ? "mt-2 w-100" : "ms-2"}
+                      >
                         <Button
                           variant={state.specialPrice.total ? "primary" : "secondary"}
                           onClick={() =>
