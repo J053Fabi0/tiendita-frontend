@@ -2,8 +2,9 @@ import TimePicker from "react-time-picker";
 import DatePicker from "react-date-picker";
 import Product from "../types/product.type";
 import { ButtonColored } from "../styles/mixins";
-import { useEffect, useReducer, useRef } from "react";
-import { Modal, Form, InputGroup, FormControl, Row, Col } from "react-bootstrap";
+import { Fragment, useEffect, useReducer, useRef } from "react";
+import { Modal, Form, InputGroup, FormControl, Row, Col, Button, ButtonGroup } from "react-bootstrap";
+import useBreakpoints from "./useBreakpoints";
 
 const ACTIONS = Object.freeze({
   SET_SHOW: "set_show",
@@ -11,6 +12,7 @@ const ACTIONS = Object.freeze({
   SET_TIME: "set_time",
   SET_PRODUCT: "set_product",
   SET_QUANTITY: "set_quantity",
+  SET_SPECIAL_PRICE: "set_special_price",
   RESET: "reset",
 } as const);
 
@@ -20,6 +22,12 @@ interface State {
   time: string;
   product?: Product | undefined;
   quantity: {
+    realValue: number;
+    showedValue: string;
+  };
+  specialPrice: {
+    exists: boolean;
+    total: boolean;
     realValue: number;
     showedValue: string;
   };
@@ -50,17 +58,32 @@ interface SetQuantity {
 interface Reset {
   type: "reset";
 }
-type Action = SetDate | SetTime | SetShow | SetProduct | SetQuantity | Reset;
+interface SetSpecialPrice {
+  type: "set_special_price";
+  specialPrice: {
+    exists?: boolean;
+    total?: boolean;
+    realValue?: number;
+    showedValue?: string;
+  };
+}
+type Action = SetDate | SetTime | SetShow | SetProduct | SetQuantity | Reset | SetSpecialPrice;
 const getTimeInFormat = (date = new Date()) => {
   const nowDate = new Date();
   const hours = nowDate.getHours();
   const minutes = nowDate.getMinutes();
   return `${hours <= 9 ? "0" : ""}${hours}:${minutes <= 9 ? "0" : ""}${minutes}`;
 };
-const defaultValues = (): Omit<State, "show"> => ({
+const defaultValues = (product?: Product): Omit<State, "show"> => ({
   date: new Date(),
   quantity: { showedValue: "1", realValue: 1 },
   time: getTimeInFormat(),
+  specialPrice: {
+    exists: false,
+    total: true,
+    realValue: product ? product.price : 1,
+    showedValue: product ? product.price.toString() : "1",
+  },
 });
 
 function reducer(state: State, action: Action) {
@@ -75,13 +98,22 @@ function reducer(state: State, action: Action) {
       return { ...state, show: action.show };
 
     case ACTIONS.SET_PRODUCT:
-      return { ...state, product: action.product };
+      return {
+        ...{ ...state, product: action.product },
+        specialPrice: {
+          ...state.specialPrice,
+          ...{ realValue: action.product.price, showedValue: action.product.price.toString() },
+        },
+      };
 
     case ACTIONS.SET_QUANTITY:
       return { ...state, quantity: action.quantity };
 
     case ACTIONS.RESET:
-      return { ...state, ...defaultValues() };
+      return { ...state, ...defaultValues(state.product) };
+
+    case ACTIONS.SET_SPECIAL_PRICE:
+      return { ...state, specialPrice: { ...state.specialPrice, ...action.specialPrice } };
 
     default:
       return state;
@@ -98,21 +130,21 @@ export default function NewSaleModal() {
   }, [state.product]);
 
   const handleClose = () => dispatch({ type: ACTIONS.SET_SHOW, show: false });
-  const handleQuantityChange = (a: any) => {
+
+  const handleNumberChange = (a: any, type: any, valueName: any) => {
     const newValueString = (a.target.value as string).replace(/\./g, "");
     const newValue = +newValueString;
 
     if (newValueString === "") {
-      dispatch({ type: ACTIONS.SET_QUANTITY, quantity: { realValue: 0, showedValue: "" } });
-    } else {
-      if (isNaN(newValue)) return;
-      if (newValue < 0) return;
-      dispatch({
-        type: ACTIONS.SET_QUANTITY,
-        quantity: { realValue: newValue, showedValue: newValue.toString() },
-      });
+      dispatch({ type, [valueName]: { realValue: 0, showedValue: "" } });
+    } else if (!(isNaN(newValue) || newValue < 0)) {
+      dispatch({ type, [valueName]: { realValue: newValue, showedValue: newValue.toString() } });
     }
   };
+  const handleQuantityChange = (a: any) => handleNumberChange(a, ACTIONS.SET_QUANTITY, "quantity");
+  const handleSpecialPriceChange = (a: any) => handleNumberChange(a, ACTIONS.SET_SPECIAL_PRICE, "specialPrice");
+
+  const { medium } = useBreakpoints().lessOrEqualThan;
 
   return {
     show: state.show,
@@ -161,7 +193,7 @@ export default function NewSaleModal() {
                 </Form.Group>
 
                 {/* Time */}
-                <Form.Group as={Col} className="mb-1 me-4" controlId="formFecha">
+                <Form.Group as={Col} className="mb-1 me-4" controlId="formHora">
                   <Form.Label>Tiempo</Form.Label>
                   <InputGroup className="mb-3">
                     <TimePicker
@@ -181,6 +213,58 @@ export default function NewSaleModal() {
                   </InputGroup>
                 </Form.Group>
               </Row>
+
+              {/* Special price */}
+              <Form.Group className="mb-1" controlId="formPrecioEspecial">
+                <Form.Label>Precio especial</Form.Label>
+                <InputGroup className="mb-3">
+                  <ButtonGroup aria-label="Basic example">
+                    <Button
+                      variant={state.specialPrice.exists ? "secondary" : "danger"}
+                      onClick={() =>
+                        dispatch({ type: ACTIONS.SET_SPECIAL_PRICE, specialPrice: { exists: false } })
+                      }
+                    >
+                      No
+                    </Button>
+                    <Button
+                      variant={state.specialPrice.exists ? "success" : "secondary"}
+                      onClick={() => dispatch({ type: ACTIONS.SET_SPECIAL_PRICE, specialPrice: { exists: true } })}
+                    >
+                      Sí
+                    </Button>
+                  </ButtonGroup>
+                  {state.specialPrice.exists ? (
+                    <Fragment>
+                      <ButtonGroup aria-label="Basic example" className={medium ? "mt-2 w-100" : "ms-2"}>
+                        <Button
+                          variant={state.specialPrice.total ? "primary" : "secondary"}
+                          onClick={() =>
+                            dispatch({ type: ACTIONS.SET_SPECIAL_PRICE, specialPrice: { total: true } })
+                          }
+                        >
+                          Total
+                        </Button>
+                        <Button
+                          variant={state.specialPrice.total ? "secondary" : "primary"}
+                          onClick={() =>
+                            dispatch({ type: ACTIONS.SET_SPECIAL_PRICE, specialPrice: { total: false } })
+                          }
+                        >
+                          c/u
+                        </Button>
+
+                        <FormControl
+                          type="text"
+                          onChange={handleSpecialPriceChange}
+                          value={state.specialPrice.showedValue}
+                          style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
+                        />
+                      </ButtonGroup>
+                    </Fragment>
+                  ) : null}
+                </InputGroup>
+              </Form.Group>
             </Modal.Body>
 
             <Modal.Footer>
