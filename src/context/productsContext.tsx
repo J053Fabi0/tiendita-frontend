@@ -1,6 +1,9 @@
+import { promisify } from "util";
 import http from "../http-common";
 import Product from "../types/product.type";
 import { useContext, createContext, useState, useEffect } from "react";
+
+const sleep = promisify(setTimeout);
 
 const ProductsContext = createContext<Product[] | null>(null);
 
@@ -17,6 +20,7 @@ export function ProductsProvider(a: { children: any }) {
           products = (await http.get<{ message: Product[] }>("/products")).data.message;
         } catch (e) {
           console.error(e);
+          await sleep(1000);
         }
 
       setProducts(products);
