@@ -120,16 +120,7 @@ export default function NewSaleModal() {
               specialPrice: 0,
             }}
           >
-            {({
-              handleSubmit,
-              handleBlur,
-              handleChange,
-              touched,
-              values,
-              errors,
-              isSubmitting,
-              validateField,
-            }) => (
+            {({ handleSubmit, handleBlur, handleChange, touched, values, errors, isSubmitting, isValid }) => (
               <FormikForm onSubmit={handleSubmit}>
                 <Modal.Body>
                   <Row>
@@ -341,7 +332,7 @@ export default function NewSaleModal() {
                 </Modal.Body>
 
                 <Modal.Footer>
-                  <Button variant="success" type="submit" disabled={isSubmitting}>
+                  <Button variant="success" type="submit" disabled={isSubmitting || !isValid}>
                     Nueva venta
                   </Button>
                 </Modal.Footer>
