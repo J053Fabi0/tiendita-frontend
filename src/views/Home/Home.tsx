@@ -3,8 +3,8 @@ import Filters from "./Filters/Filters";
 import { Fragment, useCallback } from "react";
 import Product from "../../types/product.type";
 import { Row, Col, Container } from "react-bootstrap";
-import useNewSaleModal from "../../hooks/useNewSaleModal";
 import { useProducts } from "../../context/productsContext";
+import useNewSaleModal from "../../hooks/useNewSaleModal/useNewSaleModal";
 
 export default function Home() {
   const products = useProducts();
@@ -12,7 +12,7 @@ export default function Home() {
     .fill(0)
     .map((_, i) => <Card key={i} loading={true}></Card>);
 
-  const { modal: NewSaleModal, setShow, show, setProduct, sale } = useNewSaleModal();
+  const { modal: NewSaleModal, setShow, show, setProduct } = useNewSaleModal();
 
   const handleOnClick = useCallback(
     (product: Product) => {
@@ -39,6 +39,7 @@ export default function Home() {
           </Col>
         </Row>
       </Container>
+
       {NewSaleModal}
     </Fragment>
   );

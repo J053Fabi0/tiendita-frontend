@@ -31,7 +31,6 @@ const CardComponentM = styled(({ className, children }: StyledProp) => (
 
 const lineHeight = 1.2;
 const maxLines = 1;
-const buttonHeightInLines = 2;
 
 const Price = styled(({ className, children }: StyledProp) => (
   <CardComponent.Text className={className + " mb-0"}>{children}</CardComponent.Text>
