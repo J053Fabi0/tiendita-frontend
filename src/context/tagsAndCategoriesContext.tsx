@@ -1,10 +1,8 @@
-import { promisify } from "util";
 import http from "../http-common";
+import sleep from "../utils/sleep";
 import Tag from "../types/tags.type";
 import Category from "../types/category.type";
 import { useContext, createContext, useState, useEffect } from "react";
-
-const sleep = promisify(setTimeout);
 
 const TagsAndCategoriesContext = createContext<Category[] | null>(null);
 const TagsContext = createContext<Tag[] | null>(null);

@@ -1,9 +1,7 @@
-import { promisify } from "util";
 import http from "../http-common";
+import sleep from "../utils/sleep";
 import Product from "../types/product.type";
 import { useContext, createContext, useState, useEffect } from "react";
-
-const sleep = promisify(setTimeout);
 
 const ProductsContext = createContext<Product[] | null>(null);
 
@@ -27,10 +25,5 @@ export function ProductsProvider(a: { children: any }) {
     })();
   }, []);
 
-  return (
-    <ProductsContext.Provider value={products}>
-      {/**/}
-      {a.children}
-    </ProductsContext.Provider>
-  );
+  return <ProductsContext.Provider value={products}>{a.children}</ProductsContext.Provider>;
 }
