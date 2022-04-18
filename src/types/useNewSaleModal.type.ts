@@ -2,25 +2,7 @@ import Product from "./product.type";
 
 export interface State {
   show: boolean;
-  date: Date;
-  time: string;
   product?: Product | undefined;
-  quantity: {
-    realValue: number;
-    showedValue: string;
-  };
-  specialPrice: {
-    exists: boolean;
-    total: boolean;
-    realValue: number;
-    showedValue: string;
-  };
-  cash: {
-    exists: boolean;
-    zeroCash: boolean;
-    realValue: number;
-    showedValue: string;
-  };
 }
 export interface SetDate {
   type: "set_date";

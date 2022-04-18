@@ -1,16 +1,17 @@
 import * as Yup from "yup";
 import TimePicker from "react-time-picker";
 import DatePicker from "react-date-picker";
+import Values from "../../types/values.type";
 import Product from "../../types/product.type";
 import useBreakpoints from "../useBreakpoints";
 import validateYup from "../../utils/validateYup";
 import { Formik, Form as FormikForm } from "formik";
 import { Fragment, useEffect, useReducer, useRef } from "react";
 import { Modal, InputGroup, Row, Col, Button, ButtonGroup, Form } from "react-bootstrap";
-import useReducerNewSaleModal, { ACTIONS, getTimeInFormat, defaultValues } from "./useReducerNewSaleModal";
+import useReducerNewSaleModal, { ACTIONS, getTimeInFormat } from "./useReducerNewSaleModal";
 
-export default function NewSaleModal() {
-  const [state, dispatch] = useReducer(useReducerNewSaleModal, { show: false, ...defaultValues() });
+export default function NewSaleModal(handleOnSubmit: (values: Values, product: Product) => any | Promise<any>) {
+  const [state, dispatch] = useReducer(useReducerNewSaleModal, { show: false });
 
   // Only reset the state if the product is different from the last one
   const lastProduct = useRef(state.product);
@@ -19,18 +20,6 @@ export default function NewSaleModal() {
   }, [state.product]);
 
   const handleClose = () => dispatch({ type: ACTIONS.SET_SHOW, show: false });
-
-  const handleNumberChange = (a: any, type: any, valueName: any, { forceInteger = false } = {}) => {
-    const newValueString = a.target.value.toString().replace(forceInteger ? /\./g : /(?<=\..*)\./g, "");
-    const newValue = +newValueString;
-
-    if (newValueString === "") {
-      dispatch({ type, [valueName]: { realValue: 0, showedValue: "" } });
-    } else if (!(isNaN(newValue) || newValue < 0)) {
-      dispatch({ type, [valueName]: { realValue: newValue, showedValue: newValueString } });
-    }
-  };
-  const handleCashChange = (a: any) => handleNumberChange(a, ACTIONS.SET_CASH, "cash");
 
   const { medium } = useBreakpoints().lessOrEqualThan;
 
@@ -44,7 +33,7 @@ export default function NewSaleModal() {
     time: Yup.string().required("Requerido."),
   });
 
-  const validate = (values: any) => {
+  const validate = (values: Values) => {
     const errors: any = {};
     const maxCash = values.specialPriceExists
       ? values.specialPriceTotal
@@ -99,10 +88,10 @@ export default function NewSaleModal() {
 
           <Formik
             onSubmit={(values, { setSubmitting }) => {
-              setTimeout(() => {
-                alert(JSON.stringify(values, null, 1).split("\n").slice(1, -1).join("\n"));
-                setSubmitting(false);
-              }, 1000);
+              const posiblePromise = handleOnSubmit(values, state.product as Product);
+              posiblePromise instanceof Promise
+                ? posiblePromise.then(() => setSubmitting(false))
+                : setSubmitting(false);
             }}
             validationSchema={schema}
             validate={validate}
@@ -183,7 +172,7 @@ export default function NewSaleModal() {
                           className="mt-0 pt-0"
                           disabled={isSubmitting}
                           maxTime={
-                            ((a = new Date(), b = state.date) =>
+                            ((a = new Date(), b = values.date) =>
                               a.getFullYear() === b.getFullYear() &&
                               a.getMonth() === b.getMonth() &&
                               a.getDate() === b.getDate())()
@@ -264,7 +253,7 @@ export default function NewSaleModal() {
                       </InputGroup>
                     </Form.Group>
 
-                    {/* Special price */}
+                    {/* Precio especial */}
                     <Form.Group as={Col} xs={12} controlId="formPrecioEspecial">
                       <Form.Label className="mb-1">Precio especial / descuento</Form.Label>
                       <InputGroup className="mb-3" hasValidation>
@@ -342,24 +331,24 @@ export default function NewSaleModal() {
         </Modal>
       ),
 
-    sale: (() => {
-      const a: { quantity: number; cash: number; date: Date; specialPrice?: number } = {
-        quantity: state.quantity.realValue,
-        cash: (() => {
-          if (!state.cash.exists) return (state.product?.price ?? 0) * state.quantity.realValue;
-          return state.cash.zeroCash ? 0 : state.cash.realValue;
-        })(),
-        date: (() => {
-          const newDate = new Date(state.date);
-          const [hour, minute] = state.time.split(":").map((s) => parseInt(s));
-          newDate.setHours(hour, minute, 0, 0);
-          return newDate;
-        })(),
-      };
-      if (state.specialPrice.exists)
-        a.specialPrice = state.specialPrice.realValue * (state.specialPrice.total ? 1 : state.quantity.realValue);
-      return a;
-    })(),
+    // sale: (() => {
+    //   const a: { quantity: number; cash: number; date: Date; specialPrice?: number } = {
+    //     quantity: state.quantity.realValue,
+    //     cash: (() => {
+    //       if (!state.cash.exists) return (state.product?.price ?? 0) * state.quantity.realValue;
+    //       return state.cash.zeroCash ? 0 : state.cash.realValue;
+    //     })(),
+    //     date: (() => {
+    //       const newDate = new Date(state.date);
+    //       const [hour, minute] = state.time.split(":").map((s) => parseInt(s));
+    //       newDate.setHours(hour, minute, 0, 0);
+    //       return newDate;
+    //     })(),
+    //   };
+    //   if (state.specialPrice.exists)
+    //     a.specialPrice = state.specialPrice.realValue * (state.specialPrice.total ? 1 : state.quantity.realValue);
+    //   return a;
+    // })(),
     show: state.show,
     setShow: (newValue: boolean) => dispatch({ type: ACTIONS.SET_SHOW, show: newValue }),
     setProduct: (newProduct: Product) => dispatch({ type: ACTIONS.SET_PRODUCT, product: newProduct }),
