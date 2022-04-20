@@ -243,8 +243,8 @@ export default function NewSaleModal(handleOnSubmit: (values: Values, product: P
                                 onChange={handleChange}
                                 style={{ borderRadius: ".25rem" }}
                                 placeholder="¿Cuánto fue en efectivo?"
-                                isInvalid={!!touched.cash && !!errors.cash}
                                 className={medium ? "mt-2 w-100" : "ms-2"}
+                                isInvalid={!!touched.cash && !!errors.cash}
                               />
                             )}
                             <Form.Control.Feedback type="invalid">{errors.cash}</Form.Control.Feedback>

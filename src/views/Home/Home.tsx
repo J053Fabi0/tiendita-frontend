@@ -63,8 +63,7 @@ export default function Home() {
 
   return (
     <Fragment>
-      <div className="mt-3" />
-      <Container>
+      <Container className="mt-3">
         <Row>
           <Filters />
           <Col>

@@ -1,23 +1,12 @@
-import styled from "@emotion/styled";
 import Person from "../../types/Person.type";
+import useBreakpoints from "../../hooks/useBreakpoints";
 import { Navbar as Navb, Container, Nav, NavDropdown } from "react-bootstrap";
 import { usePerson, usePersonUpdate, usePersons } from "../../context/personContext";
-import useBreakpoints from "../../hooks/useBreakpoints";
 
 interface Props {
   links: Array<{ path: string; title: string }>;
 }
 export default function Navbar({ links }: Props) {
-  const NavLink = styled(
-    ({ className, children, href }: { className?: string; children: string; href: string }) => (
-      <Nav.Link href={href} className={className}>
-        {children}
-      </Nav.Link>
-    )
-  )`
-    color: white !important;
-  `;
-
   const person = usePerson();
   const persons = usePersons();
   const setPerson = usePersonUpdate();
@@ -31,17 +20,19 @@ export default function Navbar({ links }: Props) {
   return (
     <Navb expand="lg" bg="dark" variant="dark">
       <Container>
+        <Navb.Brand>Tiendita</Navb.Brand>
         <Navb.Toggle />
         <Navb.Collapse>
           <Nav className="me-auto">
             {links.map(({ path, title }) => (
-              <NavLink key={path} href={path}>
+              <Nav.Link active={path === window.location.pathname} key={path} href={path}>
                 {title}
-              </NavLink>
+              </Nav.Link>
             ))}
 
             {persons !== null ? (
               <NavDropdown
+                className="ms-lg-3"
                 title={person ? person.name : "¿Quién eres?"}
                 menuVariant={greaterOrEqualThan.large ? undefined : "dark"}
               >

@@ -1,19 +1,23 @@
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, Dispatch, SetStateAction } from "react";
 
-export function useLocalStorage(key: string, defaultValue: any) {
-  return useStorage(key, defaultValue, window.localStorage);
+export function useLocalStorage<S>(key: string, defaultValue: any) {
+  return useStorage<S>(key, defaultValue, window.localStorage);
 }
 
-export function useSessionStorage(key: string, defaultValue: any) {
-  return useStorage(key, defaultValue, window.sessionStorage);
+export function useSessionStorage<S>(key: string, defaultValue: any) {
+  return useStorage<S>(key, defaultValue, window.sessionStorage);
 }
 
-function useStorage(key: string, defaultValue: any, storageObject: Storage) {
+function useStorage<S>(
+  key: string,
+  defaultValue: S | (() => S),
+  storageObject: Storage
+): [S, Dispatch<SetStateAction<S>>, () => void] {
   const [value, setValue] = useState(() => {
     const jsonValue = storageObject.getItem(key);
     if (jsonValue != null) return JSON.parse(jsonValue);
 
-    return typeof defaultValue === "function" ? defaultValue() : defaultValue;
+    return defaultValue instanceof Function ? defaultValue() : defaultValue;
   });
 
   useEffect(() => {

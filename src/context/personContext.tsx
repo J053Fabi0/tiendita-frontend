@@ -2,11 +2,11 @@ import http from "../http-common";
 import sleep from "../utils/sleep";
 import Person from "../types/Person.type";
 import { SetStateAction, Dispatch } from "react";
-import { Button, Dropdown, DropdownButton, Placeholder } from "react-bootstrap";
 import useReactModal from "../hooks/useReactModal";
-import { useLocalStorage } from "../hooks/useStorage";
-import { useContext, createContext, useState, useEffect } from "react";
 import randomNumberInterval from "../utils/randomNumberInterval";
+import { useContext, createContext, useState, useEffect } from "react";
+import { useLocalStorage, useSessionStorage } from "../hooks/useStorage";
+import { Button, Dropdown, DropdownButton, Placeholder } from "react-bootstrap";
 
 const PersonsContext = createContext<Person[] | null>(null);
 const PersonContext = createContext<Person | null>(null);
@@ -17,8 +17,8 @@ export const usePerson = () => useContext(PersonContext);
 export const usePersonUpdate = () => useContext(PersonUpdateContext);
 
 export function PersonsProvider(a: { children: any }) {
-  const [persons, setPersons] = useState<Person[] | null>(null);
-  const [person, setPerson] = useLocalStorage("person", null);
+  const [persons, setPersons] = useSessionStorage<Person[] | null>("persons", null);
+  const [person, setPerson] = useLocalStorage<Person | null>("person", null);
 
   useEffect(() => {
     (async () => {
@@ -33,7 +33,7 @@ export function PersonsProvider(a: { children: any }) {
 
       setPersons(persons);
     })();
-  }, []);
+  }, [setPersons]);
 
   const [selectedPerson, setSelectedPerson] = useState<number>(0);
 
@@ -55,7 +55,8 @@ export function PersonsProvider(a: { children: any }) {
     <Button
       variant="success"
       disabled={persons === null}
-      onClick={() => setPerson(persons![selectedPerson]) || setShow(false)}
+      // eslint-disable-next-line no-sequences
+      onClick={() => (setPerson(persons![selectedPerson]), setShow(false))}
     >
       Seleccionar
     </Button>,

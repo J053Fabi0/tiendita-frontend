@@ -2,6 +2,7 @@ import theme from "./styles/theme";
 import Home from "./views/Home/Home";
 import { Navbar } from "./components";
 import { ThemeProvider } from "@emotion/react";
+import Products from "./views/Products/Products";
 import { PersonsProvider } from "./context/personContext";
 import { ProductsProvider } from "./context/productsContext";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
@@ -14,10 +15,16 @@ export default function App() {
         <TagsAndCategoriesProvider>
           <ThemeProvider theme={theme}>
             <BrowserRouter>
-              <Navbar links={[{ path: "/", title: "Ventas" }]} />
+              <Navbar
+                links={[
+                  { path: "/", title: "Ventas" },
+                  { path: "/productos", title: "Nuevo producto" },
+                ]}
+              />
 
               <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/productos" element={<Products />} />
 
                 <Route path="*" element={<Home />} />
               </Routes>
