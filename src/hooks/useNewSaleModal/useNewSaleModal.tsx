@@ -79,7 +79,7 @@ export default function NewSaleModal(handleOnSubmit: (values: Values, product: P
   return {
     modal:
       state.product === undefined ? null : (
-        <Modal show={state.show && !!state.product} onHide={handleClose} centered size="lg">
+        <Modal show={state.show && !!state.product} onHide={handleClose} centered size="lg" scrollable={true}>
           <Modal.Header closeButton>
             <Modal.Title>
               {state.product.name} - ${state.product.price}

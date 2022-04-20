@@ -1,22 +1,26 @@
 import Card from "./Card/Card";
+import http from "../../http-common";
 import Filters from "./Filters/Filters";
 import Values from "../../types/values.type";
 import { Fragment, useCallback } from "react";
 import Product from "../../types/product.type";
 import { Row, Col, Container } from "react-bootstrap";
+import { usePerson } from "../../context/personContext";
 import { useProducts } from "../../context/productsContext";
 import useNewSaleModal from "../../hooks/useNewSaleModal/useNewSaleModal";
-import http from "../../http-common";
 
 export default function Home() {
   const products = useProducts();
   const loadingCards = Array(6)
     .fill(0)
     .map((_, i) => <Card key={i} loading={true}></Card>);
+  const person = usePerson();
 
   const handleOnSubmit = async (values: Values, product: Product) => {
+    if (person === null) return;
+
     const a: any = {
-      person: 1,
+      person: person.id,
       quantity: values.quantity,
       date: (() => {
         const newDate = new Date(values.date);
@@ -25,8 +29,8 @@ export default function Home() {
         return +newDate;
       })(),
       cash: (() => {
-        if (!values.cardExists) return product.price * values.quantity;
-        return values.zeroCash ? 0 : values.cash;
+        if (values.cardExists) return values.zeroCash ? 0 : values.cash;
+        else return product.price * values.quantity;
       })(),
       product: product.id,
     };

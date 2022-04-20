@@ -1,5 +1,7 @@
-import { Navbar as Navb, Container, Nav } from "react-bootstrap";
 import styled from "@emotion/styled";
+import Person from "../../types/Person.type";
+import { Navbar as Navb, Container, Nav, NavDropdown } from "react-bootstrap";
+import { usePerson, usePersonUpdate, usePersons } from "../../context/personContext";
 
 interface Props {
   links: Array<{ path: string; title: string }>;
@@ -15,6 +17,14 @@ export default function Navbar({ links }: Props) {
     color: white !important;
   `;
 
+  const person = usePerson();
+  const persons = usePersons();
+  const setPerson = usePersonUpdate();
+
+  const handlePersonClick = (person: Person) => {
+    setPerson(person);
+  };
+
   return (
     <Navb expand="lg" bg="dark" variant="dark">
       <Container>
@@ -27,13 +37,15 @@ export default function Navbar({ links }: Props) {
               </NavLink>
             ))}
 
-            {/* <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-              <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.2">Another action</NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item href="#action/3.4">Separated link</NavDropdown.Item>
-            </NavDropdown> */}
+            {persons !== null ? (
+              <NavDropdown title={person ? person.name : "¿Quién eres?"}>
+                {persons.map((person) => (
+                  <NavDropdown.Item onClick={() => handlePersonClick(person)} key={person.id}>
+                    {person.name}
+                  </NavDropdown.Item>
+                ))}
+              </NavDropdown>
+            ) : null}
           </Nav>
         </Navb.Collapse>
       </Container>
