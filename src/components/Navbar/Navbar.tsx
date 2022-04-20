@@ -2,6 +2,7 @@ import styled from "@emotion/styled";
 import Person from "../../types/Person.type";
 import { Navbar as Navb, Container, Nav, NavDropdown } from "react-bootstrap";
 import { usePerson, usePersonUpdate, usePersons } from "../../context/personContext";
+import useBreakpoints from "../../hooks/useBreakpoints";
 
 interface Props {
   links: Array<{ path: string; title: string }>;
@@ -25,6 +26,8 @@ export default function Navbar({ links }: Props) {
     setPerson(person);
   };
 
+  const { greaterOrEqualThan } = useBreakpoints();
+
   return (
     <Navb expand="lg" bg="dark" variant="dark">
       <Container>
@@ -38,7 +41,10 @@ export default function Navbar({ links }: Props) {
             ))}
 
             {persons !== null ? (
-              <NavDropdown title={person ? person.name : "¿Quién eres?"}>
+              <NavDropdown
+                title={person ? person.name : "¿Quién eres?"}
+                menuVariant={greaterOrEqualThan.large ? undefined : "dark"}
+              >
                 {persons.map((person) => (
                   <NavDropdown.Item onClick={() => handlePersonClick(person)} key={person.id}>
                     {person.name}
