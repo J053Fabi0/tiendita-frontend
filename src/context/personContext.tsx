@@ -3,9 +3,9 @@ import sleep from "../utils/sleep";
 import Person from "../types/Person.type";
 import { SetStateAction, Dispatch } from "react";
 import useReactModal from "../hooks/useReactModal";
+import { useLocalStorage } from "../hooks/useStorage";
 import randomNumberInterval from "../utils/randomNumberInterval";
 import { useContext, createContext, useState, useEffect } from "react";
-import { useLocalStorage, useSessionStorage } from "../hooks/useStorage";
 import { Button, Dropdown, DropdownButton, Placeholder } from "react-bootstrap";
 
 const PersonsContext = createContext<Person[] | null>(null);
@@ -17,7 +17,7 @@ export const usePerson = () => useContext(PersonContext);
 export const usePersonUpdate = () => useContext(PersonUpdateContext);
 
 export function PersonsProvider(a: { children: any }) {
-  const [persons, setPersons] = useSessionStorage<Person[] | null>("persons", null);
+  const [persons, setPersons] = useState<Person[] | null>(null);
   const [person, setPerson] = useLocalStorage<Person | null>("person", null);
 
   useEffect(() => {
