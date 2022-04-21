@@ -115,7 +115,6 @@ export default function Products() {
                         value={values.name}
                         disabled={isSubmitting}
                         onChange={handleChange}
-                        placeholder="Vestido huipil"
                         isInvalid={!!touched.name && !!errors.name}
                       />
                       <Form.Control.Feedback type="invalid">{errors.name}</Form.Control.Feedback>
@@ -130,7 +129,6 @@ export default function Products() {
                       <Form.Control
                         name="price"
                         type="number"
-                        placeholder="650"
                         onBlur={handleBlur}
                         value={values.price}
                         disabled={isSubmitting}
@@ -148,7 +146,6 @@ export default function Products() {
                       <Form.Control
                         name="stock"
                         type="number"
-                        placeholder="4"
                         onBlur={handleBlur}
                         value={values.stock}
                         disabled={isSubmitting}
@@ -211,12 +208,7 @@ export default function Products() {
               </Modal.Body>
 
               <Modal.Footer>
-                <Button
-                  className="cursor-pointer"
-                  variant="success"
-                  type="submit"
-                  disabled={isSubmitting || !isValid}
-                >
+                <Button className="cursor-pointer" variant="success" type="submit" disabled={isSubmitting}>
                   Crear
                 </Button>
               </Modal.Footer>
