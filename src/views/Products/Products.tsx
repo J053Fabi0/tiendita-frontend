@@ -2,11 +2,14 @@ import * as Yup from "yup";
 import { Fragment } from "react";
 import { useState } from "react";
 import styled from "@emotion/styled";
+import http from "../../http-common";
 import { PlusCircle } from "react-bootstrap-icons";
 import { Formik, Form as FormikForm } from "formik";
 import PostProduct from "../../types/PostProduct.type";
 import { useTags } from "../../context/tagsAndCategoriesContext";
-import { Button, Col, Container, Row, Modal, Form, InputGroup, Badge } from "react-bootstrap";
+import { Button, Col, Container, Row, Modal, Form, InputGroup, Badge, Spinner } from "react-bootstrap";
+import { useReloadProducts } from "../../context/productsContext";
+import { useNavigate } from "react-router-dom";
 
 const Tag = styled(Badge)`
   cursor: pointer;
@@ -23,7 +26,10 @@ const Tag = styled(Badge)`
 `;
 
 export default function Products() {
+  const tags = useTags();
+  const navigate = useNavigate();
   const [show, setShow] = useState(false);
+  const reloadProducts = useReloadProducts();
 
   const schema = Yup.object().shape({
     name: Yup.string().required("Requerido.").max(50, "Debe ser de 50 caracteres o menos."),
@@ -40,12 +46,19 @@ export default function Products() {
     description: Yup.string().optional().max(400, "Debe ser de 400 caracteres o menos."),
   });
 
-  const tags = useTags();
+  const handleOnSubmit = async (values: PostProduct) => {
+    const valuesCopy = { ...values };
+    if (values.description === "") delete valuesCopy.description;
+    if (values.tags && values.tags.length === 0) delete valuesCopy.tags;
 
-  const validate = (values: PostProduct) => {
-    const errors = {};
-
-    return errors;
+    try {
+      await http.post("/product", valuesCopy);
+      await reloadProducts();
+      navigate("/");
+      setShow(false);
+    } catch (e) {
+      console.error((e as any).response.data.error.description);
+    }
   };
 
   return (
@@ -66,18 +79,16 @@ export default function Products() {
         </Modal.Header>
 
         <Formik
-          validate={validate}
           validationSchema={schema}
-          onSubmit={(values, { setSubmitting }) => {
-            alert(JSON.stringify(values, null, 2));
-            setSubmitting(false);
-          }}
-          initialValues={{
-            name: "",
-            tags: [],
-            stock: undefined as unknown as number,
-            price: undefined as unknown as number,
-          }}
+          onSubmit={(values, { setSubmitting }) => handleOnSubmit(values).then(() => setSubmitting(false))}
+          initialValues={
+            {
+              name: "",
+              tags: [],
+              stock: undefined as unknown as number,
+              price: undefined as unknown as number,
+            } as PostProduct
+          }
         >
           {({
             values,
@@ -152,26 +163,30 @@ export default function Products() {
                   <Form.Group as={Col} xs={12} controlId="formStock">
                     <Form.Label>Tags</Form.Label>
                     <InputGroup className="mb-3">
-                      {tags?.map(({ id, name }) => (
-                        <Tag
-                          onClick={() => {
-                            const index = values.tags.indexOf(id);
-                            index === -1
-                              ? setValues((prev) => ({ ...prev, tags: [...prev.tags, id] }))
-                              : setValues((prev) => ({
-                                  ...prev,
-                                  tags: [...prev.tags.slice(0, index), ...prev.tags.slice(index + 1)],
-                                }));
-                          }}
-                          pill
-                          key={id}
-                          className="me-1 mt-1"
-                          selected={values.tags.includes(id)}
-                          bg={values.tags.includes(id) ? "primary" : "secondary"}
-                        >
-                          {name}
-                        </Tag>
-                      ))}
+                      {tags ? (
+                        tags.map(({ id, name }) => (
+                          <Tag
+                            onClick={() => {
+                              const index = values.tags!.indexOf(id);
+                              index === -1
+                                ? setValues((prev) => ({ ...prev, tags: [...(prev.tags || []), id] }))
+                                : setValues((prev) => ({
+                                    ...prev,
+                                    tags: [...prev.tags!.slice(0, index), ...prev.tags!.slice(index + 1)],
+                                  }));
+                            }}
+                            pill
+                            key={id}
+                            className="me-1 mt-1"
+                            selected={values.tags!.includes(id)}
+                            bg={values.tags!.includes(id) ? "primary" : "secondary"}
+                          >
+                            {name}
+                          </Tag>
+                        ))
+                      ) : (
+                        <Spinner animation="border" size="sm" className="me-3" />
+                      )}
                     </InputGroup>
                   </Form.Group>
 
