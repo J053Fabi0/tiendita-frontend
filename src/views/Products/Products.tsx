@@ -3,13 +3,13 @@ import { Fragment } from "react";
 import { useState } from "react";
 import styled from "@emotion/styled";
 import http from "../../http-common";
+import { useNavigate } from "react-router-dom";
 import { PlusCircle } from "react-bootstrap-icons";
 import { Formik, Form as FormikForm } from "formik";
 import PostProduct from "../../types/PostProduct.type";
-import { useTags } from "../../context/tagsAndCategoriesContext";
-import { Button, Col, Container, Row, Modal, Form, InputGroup, Badge, Spinner } from "react-bootstrap";
 import { useReloadProducts } from "../../context/productsContext";
-import { useNavigate } from "react-router-dom";
+import { useTagsAndCategories } from "../../context/tagsAndCategoriesContext";
+import { Button, Col, Container, Row, Modal, Form, InputGroup, Badge, Spinner } from "react-bootstrap";
 
 const Tag = styled(Badge)`
   cursor: pointer;
@@ -26,10 +26,10 @@ const Tag = styled(Badge)`
 `;
 
 export default function Products() {
-  const tags = useTags();
   const navigate = useNavigate();
   const [show, setShow] = useState(false);
   const reloadProducts = useReloadProducts();
+  const tagsAndCategories = useTagsAndCategories();
 
   const schema = Yup.object().shape({
     name: Yup.string().required("Requerido.").max(50, "Debe ser de 50 caracteres o menos."),
@@ -156,37 +156,6 @@ export default function Products() {
                     </InputGroup>
                   </Form.Group>
 
-                  {/* Tags */}
-                  <Form.Group as={Col} xs={12} controlId="formStock">
-                    <Form.Label>Tags</Form.Label>
-                    <InputGroup className="mb-3">
-                      {tags ? (
-                        tags.map(({ id, name }) => (
-                          <Tag
-                            onClick={() => {
-                              const index = values.tags!.indexOf(id);
-                              index === -1
-                                ? setValues((prev) => ({ ...prev, tags: [...(prev.tags || []), id] }))
-                                : setValues((prev) => ({
-                                    ...prev,
-                                    tags: [...prev.tags!.slice(0, index), ...prev.tags!.slice(index + 1)],
-                                  }));
-                            }}
-                            pill
-                            key={id}
-                            className="me-1 mt-1"
-                            selected={values.tags!.includes(id)}
-                            bg={values.tags!.includes(id) ? "primary" : "secondary"}
-                          >
-                            {name}
-                          </Tag>
-                        ))
-                      ) : (
-                        <Spinner animation="border" size="sm" className="me-3" />
-                      )}
-                    </InputGroup>
-                  </Form.Group>
-
                   {/* Description */}
                   <Form.Group as={Col} xs={12} controlId="formDescription">
                     <Form.Label>Descripción</Form.Label>
@@ -202,6 +171,45 @@ export default function Products() {
                         isInvalid={!!touched.description && !!errors.description}
                       />
                       <Form.Control.Feedback type="invalid">{errors.description}</Form.Control.Feedback>
+                    </InputGroup>
+                  </Form.Group>
+
+                  {/* Tags */}
+                  <Form.Group as={Col} xs={12} controlId="formStock">
+                    <Form.Label className="mb-0">Tags (opcionales)</Form.Label>
+                    <InputGroup className="mb-3">
+                      {tagsAndCategories ? (
+                        tagsAndCategories.map(({ id, name, tags }) => (
+                          <Fragment key={id}>
+                            <Col xs={12} className="mt-2">
+                              · {name}
+                            </Col>
+
+                            {tags.map(({ id, name }) => (
+                              <Tag
+                                onClick={() => {
+                                  const index = values.tags!.indexOf(id);
+                                  index === -1
+                                    ? setValues((prev) => ({ ...prev, tags: [...(prev.tags || []), id] }))
+                                    : setValues((prev) => ({
+                                        ...prev,
+                                        tags: [...prev.tags!.slice(0, index), ...prev.tags!.slice(index + 1)],
+                                      }));
+                                }}
+                                pill
+                                key={id}
+                                className="me-1 mt-1"
+                                selected={values.tags!.includes(id)}
+                                bg={values.tags!.includes(id) ? "primary" : "secondary"}
+                              >
+                                {name}
+                              </Tag>
+                            ))}
+                          </Fragment>
+                        ))
+                      ) : (
+                        <Spinner animation="border" size="sm" className="me-3" />
+                      )}
                     </InputGroup>
                   </Form.Group>
                 </Row>
