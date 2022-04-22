@@ -25,7 +25,7 @@ const CardComponentM = styled(CardComponent)(({ theme: { colors } }: any) => ({
   "flexDirection": "row",
   ":hover": { borderColor: colors.primary },
   "cursor": "pointer",
-  "@media (max-width: 991px)": { flexDirection: "column", height: "auto" },
+  "@media (max-width: 767px)": { flexDirection: "column", height: "auto" },
 }));
 
 const lineHeight = 1.2;
