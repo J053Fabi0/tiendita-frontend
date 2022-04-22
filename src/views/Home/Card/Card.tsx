@@ -1,12 +1,12 @@
 import _ from "lodash";
-import { memo, useRef } from "react";
+import { memo } from "react";
 import CardPlaceholder from "./CardPlaceholder";
 import Product from "../../../types/product.type";
 import useBreakpoints from "../../../hooks/useBreakpoints";
 import { useTags } from "../../../context/tagsAndCategoriesContext";
 import randomNumberInterval from "../../../utils/randomNumberInterval";
-import { BadgesDiv, CardComponentM, Container, Price } from "./CardComponents";
-import { Col, Row, Card as CardComponent, Badge, Placeholder, Button } from "react-bootstrap";
+import { Col, Card as CardComponent, Badge, Placeholder } from "react-bootstrap";
+import { BadgesDiv, CardComponentM, Container, RowBottom } from "./CardComponents";
 
 function Card({
   loading,
@@ -31,25 +31,18 @@ function Card({
     )
   );
 
-  const { lessOrEqualThan, greaterOrEqualThan } = useBreakpoints();
-
-  const stockRowRef = useRef() as any;
-  const handleCardClick = () => {
-    if (lessOrEqualThan.small) handleOnClick(product);
-  };
+  const { lessOrEqualThan } = useBreakpoints();
 
   return (
     <Container>
       <CardComponentM>
-        <Col onClick={handleCardClick}>
+        <Col onClick={() => handleOnClick(product)} className="position-relative">
           <CardComponent.Body className="h-100">
             {loading ? (
               <CardPlaceholder />
             ) : (
               <>
                 <CardComponent.Title>{product.name}</CardComponent.Title>
-                {greaterOrEqualThan.medium ? <Price>${product.price}</Price> : null}
-
                 {tags.length === 0 && lessOrEqualThan.small ? null : (
                   <>
                     <div className="mt-2" />
@@ -58,19 +51,14 @@ function Card({
                   </>
                 )}
 
-                <p className="d-none d-md-block d-lg-none mb-1 mt-1">Stock: 5</p>
-                <Row ref={stockRowRef}>
-                  <Col xs={6} md={12} lg={7}>
-                    {lessOrEqualThan.small ? (
-                      <Price>${product.price}</Price>
-                    ) : (
-                      <Button onClick={() => handleOnClick(product)}>Nueva venta</Button>
-                    )}
+                <div className="mt-4" />
+
+                <RowBottom className="position-absolute w-100">
+                  <Col className="d-flex">
+                    <p className="mt-0 mb-0 w-50">${product.price}</p>
+                    <p className="text-end mt-0 mb-0 w-50">Stock: {product.stock}</p>
                   </Col>
-                  <Col className="d-sm-flex d-md-none d-lg-flex justify-content-end">
-                    <p className="text-end mt-0 mb-0 h-auto">Stock: {product.stock}</p>
-                  </Col>
-                </Row>
+                </RowBottom>
               </>
             )}
           </CardComponent.Body>

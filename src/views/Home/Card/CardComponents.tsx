@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import StyledProp from "../../../types/styledProp.type";
 import { AllCenteredDiv } from "../../../styles/mixins";
-import { Col, Card as CardComponent } from "react-bootstrap";
+import { Col, Card as CardComponent, Row } from "react-bootstrap";
 
 const Container = styled(
   AllCenteredDiv.withComponent(({ className, children }: StyledProp) => (
@@ -19,13 +19,12 @@ const Container = styled(
   },
 }));
 
-const CardComponentM = styled(({ className, children }: StyledProp) => (
-  <CardComponent className={className}>{children}</CardComponent>
-))(({ theme: { colors } }: any) => ({
+const CardComponentM = styled(CardComponent)(({ theme: { colors } }: any) => ({
   "width": "100%",
   "height": "100%",
   "flexDirection": "row",
   ":hover": { borderColor: colors.primary },
+  "cursor": "pointer",
   "@media (max-width: 991px)": { flexDirection: "column", height: "auto" },
 }));
 
@@ -60,4 +59,6 @@ const BadgesDiv = styled.div`
   }
 `;
 
-export { Container, CardComponentM, Price, BadgesDiv };
+const RowBottom = styled(Row)({ bottom: 15 });
+
+export { Container, CardComponentM, Price, BadgesDiv, RowBottom };
