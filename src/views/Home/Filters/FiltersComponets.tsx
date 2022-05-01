@@ -25,17 +25,19 @@ const FiltersContainer = styled(({ className, children }: StyledProp) => (
   "@media (max-width: 767px)": { width: "100%", paddingBottom: 20, maxWidth: "100%" },
 });
 
-const Category = styled.p({
-  fontSize: 18,
-  marginTop: 10,
-  fontWeight: "bold",
+const Category = styled.a({
+  "fontSize": 18,
+  "marginTop": 10,
+  "color": "black",
+  "fontWeight": "bold",
+  ":hover": { color: "#444", cursor: "pointer" },
 });
 
 const Tag = styled.a({
   "marginLeft": 20,
   "fontSize": 16,
   "color": "black",
-  ":hover": { color: "black", cursor: "pointer", fontWeight: "bold" },
+  ":hover": { color: "#222", cursor: "pointer", fontWeight: "bold" },
 });
 
 export { FiltersBar, FiltersContainer, Category, Tag };
