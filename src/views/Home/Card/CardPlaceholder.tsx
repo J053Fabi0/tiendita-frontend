@@ -1,12 +1,9 @@
 import { memo } from "react";
 import { BadgesDiv, Price } from "./CardComponents";
-import useBreakpoints from "../../../hooks/useBreakpoints";
-import { Placeholder, Row, Col, Card } from "react-bootstrap";
+import { Placeholder, Card } from "react-bootstrap";
 import randomNumberInterval from "../../../utils/randomNumberInterval";
 
 function CardPlaceholder() {
-  const { lessOrEqualThan } = useBreakpoints();
-
   return (
     <>
       <Placeholder as={Card.Title} animation="glow">

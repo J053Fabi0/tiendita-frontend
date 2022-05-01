@@ -1,16 +1,21 @@
 import * as Yup from "yup";
+import styled from "@emotion/styled";
 import TimePicker from "react-time-picker";
 import DatePicker from "react-date-picker";
 import Values from "../../types/values.type";
+import { Pencil } from "react-bootstrap-icons";
 import Product from "../../types/product.type";
 import useBreakpoints from "../useBreakpoints";
 import validateYup from "../../utils/validateYup";
 import { Formik, Form as FormikForm } from "formik";
+import StyledProp from "../../types/styledProp.type";
+import { usePerson } from "../../context/personContext";
 import { Fragment, useEffect, useReducer, useRef } from "react";
-import { Modal, InputGroup, Row, Col, Button, ButtonGroup, Form } from "react-bootstrap";
+import { Modal, InputGroup, Button, Row, Col, ButtonGroup, Form } from "react-bootstrap";
 import useReducerNewSaleModal, { ACTIONS, getTimeInFormat } from "./useReducerNewSaleModal";
 
 export default function NewSaleModal(handleOnSubmit: (values: Values, product: Product) => any | Promise<any>) {
+  const person = usePerson();
   const [state, dispatch] = useReducer(useReducerNewSaleModal, { show: false });
 
   // Only reset the state if the product is different from the last one
@@ -76,14 +81,38 @@ export default function NewSaleModal(handleOnSubmit: (values: Values, product: P
     return errors;
   };
 
+  const EditButton = styled(({ className, children, onClick }: StyledProp) => (
+    <button className={`btn-close ${className}`} onClick={onClick}>
+      {children}
+    </button>
+  ))({
+    display: "flex",
+    background: "none",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: "0 !important",
+  });
+  const CloseButton = styled(({ className, onClick }: StyledProp) => (
+    <button className={`btn-close ${className}`} onClick={onClick} />
+  ))({ marginLeft: "0 !important" });
+
   return {
     modal:
       state.product === undefined ? null : (
-        <Modal show={state.show && !!state.product} onHide={handleClose} centered size="lg" scrollable={true}>
-          <Modal.Header closeButton>
+        <Modal show={state.show && !!state.product} onHide={handleClose} centered size="lg">
+          <Modal.Header closeButton={person?.role === "employee"}>
             <Modal.Title>
               {state.product.name} - ${state.product.price}
             </Modal.Title>
+
+            {person?.role === "admin" ? (
+              <>
+                <EditButton>
+                  <Pencil />
+                </EditButton>
+                <CloseButton onClick={() => dispatch({ type: ACTIONS.SET_SHOW, show: false })} />
+              </>
+            ) : null}
           </Modal.Header>
 
           <Formik
@@ -330,25 +359,6 @@ export default function NewSaleModal(handleOnSubmit: (values: Values, product: P
           </Formik>
         </Modal>
       ),
-
-    // sale: (() => {
-    //   const a: { quantity: number; cash: number; date: Date; specialPrice?: number } = {
-    //     quantity: state.quantity.realValue,
-    //     cash: (() => {
-    //       if (!state.cash.exists) return (state.product?.price ?? 0) * state.quantity.realValue;
-    //       return state.cash.zeroCash ? 0 : state.cash.realValue;
-    //     })(),
-    //     date: (() => {
-    //       const newDate = new Date(state.date);
-    //       const [hour, minute] = state.time.split(":").map((s) => parseInt(s));
-    //       newDate.setHours(hour, minute, 0, 0);
-    //       return newDate;
-    //     })(),
-    //   };
-    //   if (state.specialPrice.exists)
-    //     a.specialPrice = state.specialPrice.realValue * (state.specialPrice.total ? 1 : state.quantity.realValue);
-    //   return a;
-    // })(),
     show: state.show,
     setShow: (newValue: boolean) => dispatch({ type: ACTIONS.SET_SHOW, show: newValue }),
     setProduct: (newProduct: Product) => dispatch({ type: ACTIONS.SET_PRODUCT, product: newProduct }),
