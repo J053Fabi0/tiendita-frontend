@@ -90,17 +90,7 @@ export default function Products() {
             } as PostProduct
           }
         >
-          {({
-            values,
-            errors,
-            touched,
-            isValid,
-            setValues,
-            handleBlur,
-            handleSubmit,
-            handleChange,
-            isSubmitting,
-          }) => (
+          {({ values, errors, touched, setValues, handleBlur, handleSubmit, handleChange, isSubmitting }) => (
             <FormikForm onSubmit={handleSubmit}>
               <Modal.Body>
                 <Row>

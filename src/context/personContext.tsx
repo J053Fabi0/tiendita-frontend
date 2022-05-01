@@ -1,78 +1,140 @@
+import * as Yup from "yup";
 import http from "../http-common";
-import sleep from "../utils/sleep";
 import Person from "../types/Person.type";
-import { SetStateAction, Dispatch } from "react";
-import useReactModal from "../hooks/useReactModal";
+import useCookie from "../hooks/useCookie";
+import SignInQuery from "../types/signinQuery.type";
+import { Formik, Form as FormikForm } from "formik";
 import { useLocalStorage } from "../hooks/useStorage";
-import randomNumberInterval from "../utils/randomNumberInterval";
-import { useContext, createContext, useState, useEffect } from "react";
-import { Button, Dropdown, DropdownButton, Placeholder } from "react-bootstrap";
+import SignInResult from "../types/signInResult.type";
+import { SetStateAction, Dispatch, useEffect } from "react";
+import { useContext, createContext, useState } from "react";
+import { Alert, Button, Col, Form, InputGroup, Modal, Row } from "react-bootstrap";
 
-const PersonsContext = createContext<Person[] | null>(null);
+const AuthTokenContext = createContext<string>("");
 const PersonContext = createContext<Person | null>(null);
 const PersonUpdateContext = createContext<Dispatch<SetStateAction<Person | null>>>(null as any);
 
-export const usePersons = () => useContext(PersonsContext);
+export const useAuthToken = () => useContext(AuthTokenContext);
 export const usePerson = () => useContext(PersonContext);
 export const usePersonUpdate = () => useContext(PersonUpdateContext);
 
 export function PersonsProvider(a: { children: any }) {
-  const [persons, setPersons] = useState<Person[] | null>(null);
+  const [error, setError] = useState<null | string>(null);
   const [person, setPerson] = useLocalStorage<Person | null>("person", null);
+  const [authToken, setAuthToken] = useCookie("authtoken", "", { secure: true });
 
   useEffect(() => {
-    (async () => {
-      let persons: null | Person[] = null;
-      while (persons === null)
-        try {
-          persons = (await http.get<{ message: Person[] }>("/persons")).data.message;
-        } catch (e) {
-          console.error(e);
-          await sleep(1000);
-        }
+    if (authToken !== "") http.defaults.headers.common["Authorization"] = authToken;
+    else delete http.defaults.headers.common["Authorization"];
+  }, [authToken]);
 
-      setPersons(persons);
-    })();
-  }, [setPersons]);
+  const schema = Yup.object().shape({
+    username: Yup.string().required("Requerido."),
+    password: Yup.string().required("Requerido."),
+  });
 
-  const [selectedPerson, setSelectedPerson] = useState<number>(0);
+  const handleOnSubmit = async (values: SignInQuery) => {
+    try {
+      const { authToken, person } = (await http.get<SignInResult>("/signin", { params: { ...values } })).data
+        .message;
+      http.defaults.headers.common["Authorization"] = authToken;
+      setAuthToken(authToken);
+      setPerson(person);
+      setShow(false);
+    } catch (e: any) {
+      if (e?.response?.data?.error === "Invalid data") {
+        setError("Datos incorrectos");
+        console.error(e.response.data.error);
+      } else {
+        console.log(e);
+        setError("Hubo un error desconocido. Contacta a @SenorBinario por Telegram.");
+      }
+    }
+  };
 
-  const { Modal, setShow } = useReactModal(
-    "¿Quién eres?",
+  const [show, setShow] = useState(authToken === "");
+  const SignInModal = (
+    <Modal show={show} onHide={() => setShow(false)} centered backdrop="static" keyboard={false}>
+      <Modal.Header>
+        <Modal.Title>Iniciar sesión</Modal.Title>
+      </Modal.Header>
 
-    persons !== null ? (
-      <DropdownButton title={persons[selectedPerson].name}>
-        {persons.map(({ id, name }, i) => (
-          <Dropdown.Item onClick={() => setSelectedPerson(i)} key={id}>
-            {name}
-          </Dropdown.Item>
-        ))}
-      </DropdownButton>
-    ) : (
-      <Placeholder.Button xs={randomNumberInterval(3, 5)} />
-    ),
+      <Formik
+        validationSchema={schema}
+        initialValues={{ username: "", password: "" }}
+        onSubmit={(values, { setSubmitting }) => handleOnSubmit(values).then(() => setSubmitting(false))}
+      >
+        {({ values, errors, touched, handleBlur, handleSubmit, handleChange, isSubmitting }) => (
+          <FormikForm onSubmit={handleSubmit}>
+            <Modal.Body>
+              <Row>
+                <Alert
+                  dismissible
+                  variant="danger"
+                  transition={false}
+                  show={error !== null}
+                  onClose={() => setError(null)}
+                >
+                  {error}
+                </Alert>
 
-    <Button
-      variant="success"
-      disabled={persons === null}
-      // eslint-disable-next-line no-sequences
-      onClick={() => (setPerson(persons![selectedPerson]), setShow(false))}
-    >
-      Seleccionar
-    </Button>,
+                {/* Username */}
+                <Form.Group as={Col} xs={12} controlId="formUsername">
+                  <Form.Label>Nombre de usuario</Form.Label>
+                  <InputGroup className="mb-3" hasValidation>
+                    <Form.Control
+                      type="text"
+                      name="username"
+                      autoFocus={true}
+                      onBlur={handleBlur}
+                      value={values.username}
+                      disabled={isSubmitting}
+                      onChange={handleChange}
+                      isInvalid={!!touched.username && !!errors.username}
+                    />
+                    <Form.Control.Feedback type="invalid">{errors.username}</Form.Control.Feedback>
+                  </InputGroup>
+                </Form.Group>
 
-    { showDefaultValue: !person, verticallyCentered: true, backdrop: "static" }
+                {/* Password */}
+                <Form.Group as={Col} xs={12} controlId="formPassword">
+                  <Form.Label>Contraseña</Form.Label>
+                  <InputGroup className="mb-3" hasValidation>
+                    <Form.Control
+                      type="password"
+                      name="password"
+                      onBlur={handleBlur}
+                      value={values.password}
+                      disabled={isSubmitting}
+                      onChange={handleChange}
+                      isInvalid={!!touched.password && !!errors.password}
+                    />
+                    <Form.Control.Feedback type="invalid">{errors.password}</Form.Control.Feedback>
+                  </InputGroup>
+                </Form.Group>
+              </Row>
+            </Modal.Body>
+
+            <Modal.Footer className="justify-content-center">
+              <Button className="cursor-pointer" variant="success" type="submit" disabled={isSubmitting}>
+                Iniciar sesión
+              </Button>
+            </Modal.Footer>
+          </FormikForm>
+        )}
+      </Formik>
+    </Modal>
   );
 
   return (
-    <PersonsContext.Provider value={persons}>
-      <PersonContext.Provider value={person}>
+    <PersonContext.Provider value={person}>
+      <AuthTokenContext.Provider value={authToken}>
         <PersonUpdateContext.Provider value={setPerson}>
           {/**/}
-          {Modal}
+          {SignInModal}
           {a.children}
         </PersonUpdateContext.Provider>
-      </PersonContext.Provider>
-    </PersonsContext.Provider>
+      </AuthTokenContext.Provider>
+    </PersonContext.Provider>
   );
 }

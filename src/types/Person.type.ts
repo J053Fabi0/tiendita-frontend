@@ -1,4 +1,6 @@
 export default interface Person {
-  name: string;
   id: number;
+  name: string;
+  username: string;
+  role: "admin" | "eployee";
 }
