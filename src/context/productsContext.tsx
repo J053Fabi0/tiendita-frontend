@@ -1,7 +1,7 @@
 import http from "../http-common";
 import sleep from "../utils/sleep";
 import Product from "../types/product.type";
-import { useAuthToken } from "./personContext";
+import { useAuthTokenReady } from "./personContext";
 import { useContext, createContext, useState, useEffect, useCallback } from "react";
 
 const ProductsContext = createContext<Product[] | null>(null);
@@ -11,11 +11,11 @@ export const useProducts = () => useContext(ProductsContext);
 export const useReloadProducts = () => useContext(ReloadProductsContext);
 
 export function ProductsProvider(a: { children: any }) {
-  const authToken = useAuthToken();
+  const authTokenReady = useAuthTokenReady();
   const [products, setProducts] = useState<null | Product[]>(null);
 
   const reloadProducts = useCallback(async () => {
-    if (authToken === "") return setProducts(null);
+    if (!authTokenReady) return setProducts(null);
 
     let products: null | Product[] = null;
     while (products === null)
@@ -27,7 +27,7 @@ export function ProductsProvider(a: { children: any }) {
       }
 
     setProducts(products);
-  }, [authToken]);
+  }, [authTokenReady]);
   useEffect(() => void reloadProducts(), [reloadProducts]);
 
   return (

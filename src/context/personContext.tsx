@@ -12,20 +12,28 @@ import { Alert, Button, Col, Form, InputGroup, Modal, Row } from "react-bootstra
 
 const AuthTokenContext = createContext<string>("");
 const PersonContext = createContext<Person | null>(null);
+const AuthTokenReadyContext = createContext<boolean>(false);
 const LogOutContext = createContext<() => void>(null as any);
 
-export const useAuthToken = () => useContext(AuthTokenContext);
 export const usePerson = () => useContext(PersonContext);
 export const useLogOut = () => useContext(LogOutContext);
+export const useAuthToken = () => useContext(AuthTokenContext);
+export const useAuthTokenReady = () => useContext(AuthTokenReadyContext);
 
 export function PersonsProvider(a: { children: any }) {
   const [error, setError] = useState<null | string>(null);
   const [person, setPerson] = useLocalStorage<Person | null>("person", null);
   const [authToken, setAuthToken] = useCookie("authtoken", "", { secure: true });
+  const [authTokenReady, setAuthTokenReady] = useState<boolean>(false);
 
   useEffect(() => {
-    if (authToken) http.defaults.headers.common["Authorization"] = authToken;
-    else delete http.defaults.headers.common["Authorization"];
+    if (authToken) {
+      http.defaults.headers.common["Authorization"] = authToken;
+      setAuthTokenReady(true);
+    } else {
+      delete http.defaults.headers.common["Authorization"];
+      setAuthTokenReady(false);
+    }
   }, [authToken]);
 
   const schema = Yup.object().shape({
@@ -128,19 +136,21 @@ export function PersonsProvider(a: { children: any }) {
 
   return (
     <PersonContext.Provider value={person}>
-      <AuthTokenContext.Provider value={authToken}>
-        <LogOutContext.Provider
-          value={() => {
-            setShow(true);
-            setPerson(null);
-            setAuthToken("");
-          }}
-        >
-          {/**/}
-          {SignInModal}
-          {a.children}
-        </LogOutContext.Provider>
-      </AuthTokenContext.Provider>
+      <AuthTokenReadyContext.Provider value={authTokenReady}>
+        <AuthTokenContext.Provider value={authToken}>
+          <LogOutContext.Provider
+            value={() => {
+              setShow(true);
+              setPerson(null);
+              setAuthToken("");
+            }}
+          >
+            {/**/}
+            {SignInModal}
+            {a.children}
+          </LogOutContext.Provider>
+        </AuthTokenContext.Provider>
+      </AuthTokenReadyContext.Provider>
     </PersonContext.Provider>
   );
 }
