@@ -18,7 +18,7 @@ export default function App() {
               <Navbar
                 links={[
                   { path: "/", title: "Ventas" },
-                  { path: "/productos", title: "Nuevo producto", onlyAdmins: true },
+                  { path: "/productos", title: "Productos", onlyAdmins: true },
                 ]}
               />
 
