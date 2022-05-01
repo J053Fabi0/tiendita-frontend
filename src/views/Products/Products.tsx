@@ -1,12 +1,13 @@
 import * as Yup from "yup";
-import { Fragment } from "react";
 import { useState } from "react";
 import styled from "@emotion/styled";
 import http from "../../http-common";
+import { Fragment, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PlusCircle } from "react-bootstrap-icons";
 import { Formik, Form as FormikForm } from "formik";
 import PostProduct from "../../types/PostProduct.type";
+import { usePerson } from "../../context/personContext";
 import { useReloadProducts } from "../../context/productsContext";
 import { useTagsAndCategories } from "../../context/tagsAndCategoriesContext";
 import { Button, Col, Container, Row, Modal, Form, InputGroup, Badge, Spinner } from "react-bootstrap";
@@ -26,7 +27,12 @@ const Tag = styled(Badge)`
 `;
 
 export default function Products() {
+  const person = usePerson();
   const navigate = useNavigate();
+  useEffect(() => {
+    if (person?.role === "employee") navigate("/");
+  }, [person, navigate]);
+
   const [show, setShow] = useState(false);
   const reloadProducts = useReloadProducts();
   const tagsAndCategories = useTagsAndCategories();
@@ -61,7 +67,7 @@ export default function Products() {
     }
   };
 
-  return (
+  return person === null ? null : (
     <Fragment>
       <Container className="mt-3">
         <Row>

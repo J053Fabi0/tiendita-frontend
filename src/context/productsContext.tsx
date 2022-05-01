@@ -15,7 +15,8 @@ export function ProductsProvider(a: { children: any }) {
   const [products, setProducts] = useState<null | Product[]>(null);
 
   const reloadProducts = useCallback(async () => {
-    if (authToken === "") return;
+    if (authToken === "") return setProducts(null);
+
     let products: null | Product[] = null;
     while (products === null)
       try {

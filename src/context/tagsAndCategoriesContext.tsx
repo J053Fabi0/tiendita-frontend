@@ -18,7 +18,12 @@ export function TagsAndCategoriesProvider(a: { children: any }) {
 
   useEffect(() => {
     (async () => {
-      if (authToken === "") return;
+      if (authToken === "") {
+        setTags(null);
+        setTagsAndCategories(null);
+        return;
+      }
+
       let message: null | Category[] = null;
       while (message === null)
         try {

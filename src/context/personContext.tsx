@@ -1,22 +1,22 @@
 import * as Yup from "yup";
 import http from "../http-common";
+import { useEffect } from "react";
 import Person from "../types/Person.type";
 import useCookie from "../hooks/useCookie";
 import SignInQuery from "../types/signinQuery.type";
 import { Formik, Form as FormikForm } from "formik";
 import { useLocalStorage } from "../hooks/useStorage";
 import SignInResult from "../types/signInResult.type";
-import { SetStateAction, Dispatch, useEffect } from "react";
 import { useContext, createContext, useState } from "react";
 import { Alert, Button, Col, Form, InputGroup, Modal, Row } from "react-bootstrap";
 
 const AuthTokenContext = createContext<string>("");
 const PersonContext = createContext<Person | null>(null);
-const PersonUpdateContext = createContext<Dispatch<SetStateAction<Person | null>>>(null as any);
+const LogOutContext = createContext<() => void>(null as any);
 
 export const useAuthToken = () => useContext(AuthTokenContext);
 export const usePerson = () => useContext(PersonContext);
-export const usePersonUpdate = () => useContext(PersonUpdateContext);
+export const useLogOut = () => useContext(LogOutContext);
 
 export function PersonsProvider(a: { children: any }) {
   const [error, setError] = useState<null | string>(null);
@@ -24,7 +24,7 @@ export function PersonsProvider(a: { children: any }) {
   const [authToken, setAuthToken] = useCookie("authtoken", "", { secure: true });
 
   useEffect(() => {
-    if (authToken !== "") http.defaults.headers.common["Authorization"] = authToken;
+    if (authToken) http.defaults.headers.common["Authorization"] = authToken;
     else delete http.defaults.headers.common["Authorization"];
   }, [authToken]);
 
@@ -129,11 +129,17 @@ export function PersonsProvider(a: { children: any }) {
   return (
     <PersonContext.Provider value={person}>
       <AuthTokenContext.Provider value={authToken}>
-        <PersonUpdateContext.Provider value={setPerson}>
+        <LogOutContext.Provider
+          value={() => {
+            setShow(true);
+            setPerson(null);
+            setAuthToken("");
+          }}
+        >
           {/**/}
           {SignInModal}
           {a.children}
-        </PersonUpdateContext.Provider>
+        </LogOutContext.Provider>
       </AuthTokenContext.Provider>
     </PersonContext.Provider>
   );
