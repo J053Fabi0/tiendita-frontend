@@ -7,6 +7,7 @@ import Product from "../../types/product.type";
 import { Row, Col, Container } from "react-bootstrap";
 import { usePerson } from "../../context/personContext";
 import { useProducts } from "../../context/productsContext";
+import usePatchProductModal from "../../hooks/usePatchProductModal";
 import useNewSaleModal from "../../hooks/useNewSaleModal/useNewSaleModal";
 
 export default function Home() {
@@ -45,7 +46,12 @@ export default function Home() {
     }
   };
 
-  const { modal: NewSaleModal, setShow, show, setProduct } = useNewSaleModal(handleOnSubmit);
+  const { Modal: NewSaleModal, setShow, show, setProduct, product } = useNewSaleModal(handleOnSubmit, onEdit);
+  const { Modal: PatchProductModal, setShow: setShowPatchModal } = usePatchProductModal(product);
+
+  function onEdit() {
+    setShowPatchModal(true);
+  }
 
   const handleOnClick = useCallback(
     (product: Product) => {
@@ -73,6 +79,7 @@ export default function Home() {
       </Container>
 
       {NewSaleModal}
+      {PatchProductModal}
     </Fragment>
   );
 }

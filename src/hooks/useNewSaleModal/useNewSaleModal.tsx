@@ -10,11 +10,14 @@ import validateYup from "../../utils/validateYup";
 import { Formik, Form as FormikForm } from "formik";
 import StyledProp from "../../types/styledProp.type";
 import { usePerson } from "../../context/personContext";
-import { Fragment, useEffect, useReducer, useRef } from "react";
+import { Fragment, MouseEventHandler, useEffect, useReducer, useRef } from "react";
 import { Modal, InputGroup, Button, Row, Col, ButtonGroup, Form } from "react-bootstrap";
 import useReducerNewSaleModal, { ACTIONS, getTimeInFormat } from "./useReducerNewSaleModal";
 
-export default function NewSaleModal(handleOnSubmit: (values: Values, product: Product) => any | Promise<any>) {
+export default function useNewSaleModal(
+  handleOnSubmit: (values: Values, product: Product) => any | Promise<any>,
+  onEdit?: MouseEventHandler<HTMLButtonElement>
+) {
   const person = usePerson();
   const [state, dispatch] = useReducer(useReducerNewSaleModal, { show: false });
 
@@ -97,7 +100,7 @@ export default function NewSaleModal(handleOnSubmit: (values: Values, product: P
   ))({ marginLeft: "0 !important" });
 
   return {
-    modal:
+    Modal:
       state.product === undefined ? null : (
         <Modal show={state.show && !!state.product} onHide={handleClose} centered size="lg">
           <Modal.Header closeButton={person?.role === "employee"}>
@@ -107,7 +110,12 @@ export default function NewSaleModal(handleOnSubmit: (values: Values, product: P
 
             {person?.role === "admin" ? (
               <>
-                <EditButton>
+                <EditButton
+                  onClick={(...params) => {
+                    onEdit?.(...params);
+                    dispatch({ type: ACTIONS.SET_SHOW, show: false });
+                  }}
+                >
                   <Pencil />
                 </EditButton>
                 <CloseButton onClick={() => dispatch({ type: ACTIONS.SET_SHOW, show: false })} />
@@ -359,8 +367,10 @@ export default function NewSaleModal(handleOnSubmit: (values: Values, product: P
           </Formik>
         </Modal>
       ),
+
     show: state.show,
     setShow: (newValue: boolean) => dispatch({ type: ACTIONS.SET_SHOW, show: newValue }),
+    product: state.product,
     setProduct: (newProduct: Product) => dispatch({ type: ACTIONS.SET_PRODUCT, product: newProduct }),
   };
 }
