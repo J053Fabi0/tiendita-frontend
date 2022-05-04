@@ -6,7 +6,7 @@ import styled from "@emotion/styled";
 import Product from "../types/product.type";
 import { Formik, Form as FormikForm } from "formik";
 import PostProduct from "../types/PostProduct.type";
-import { useReloadProducts } from "../context/productsContext";
+import { useReloadProduct } from "../context/productsContext";
 import { useTagsAndCategories } from "../context/tagsAndCategoriesContext";
 import { Button, Col, Row, Modal, Form, InputGroup, Badge, Spinner } from "react-bootstrap";
 
@@ -26,7 +26,7 @@ const Tag = styled(Badge)`
 
 export default function useNewProductModal(product?: Product) {
   const [show, setShow] = useState(false);
-  const reloadProducts = useReloadProducts();
+  const reloadProduct = useReloadProduct();
   const tagsAndCategories = useTagsAndCategories();
 
   const schema = Yup.object().shape({
@@ -50,8 +50,8 @@ export default function useNewProductModal(product?: Product) {
     if (values.tags && values.tags.length === 0) delete valuesCopy.tags;
 
     try {
-      await http.post("/product", valuesCopy);
-      await reloadProducts();
+      const id = (await http.post("/product", valuesCopy)).data.message as number;
+      await reloadProduct(id);
       setShow(false);
     } catch (e) {
       console.error((e as any).response.data.error.description);
@@ -75,7 +75,7 @@ export default function useNewProductModal(product?: Product) {
 
     try {
       await http.patch("/product", { ...valuesToPatch, id: product!.id });
-      await reloadProducts();
+      await reloadProduct(product!.id);
       setShow(false);
     } catch (e) {
       console.error((e as any).response.data.error.description);

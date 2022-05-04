@@ -9,7 +9,7 @@ import useProductModal from "../../hooks/useProductModal";
 import useNewProductModal from "../../hooks/useProductModal";
 import { Button, Col, Container, Row } from "react-bootstrap";
 import { Fragment, useCallback, useEffect, useState } from "react";
-import { useProducts, useReloadProducts } from "../../context/productsContext";
+import { useProducts, useRemoveProductLocally } from "../../context/productsContext";
 
 export default function Products() {
   const person = usePerson();
@@ -19,7 +19,7 @@ export default function Products() {
   }, [person, navigate]);
 
   const products = useProducts();
-  const reloadProducts = useReloadProducts();
+  const removeProductLocally = useRemoveProductLocally();
   const [product, setProduct] = useState<Product | undefined>(undefined);
 
   const loadingCards = Array(6)
@@ -36,7 +36,7 @@ export default function Products() {
     setDeleting(true);
     try {
       await http.delete("/product", { data: { id: product.id } });
-      await reloadProducts();
+      removeProductLocally(product.id);
     } catch (e: any) {
       alert("Hubo un error.");
       if (e?.response?.data?.error) {
