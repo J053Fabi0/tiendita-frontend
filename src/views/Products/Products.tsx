@@ -4,10 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { PlusCircle } from "react-bootstrap-icons";
 import { usePerson } from "../../context/personContext";
 import useProductModal from "../../hooks/useProductModal";
-import { useProducts } from "../../context/productsContext";
+import { useProducts, useReloadProducts } from "../../context/productsContext";
 import useNewProductModal from "../../hooks/useProductModal";
 import { Button, Col, Container, Row } from "react-bootstrap";
 import { Fragment, useCallback, useEffect, useState } from "react";
+import useReactModal from "../../hooks/useReactModal";
+import http from "../../http-common";
 
 export default function Products() {
   const person = usePerson();
@@ -17,6 +19,7 @@ export default function Products() {
   }, [person, navigate]);
 
   const products = useProducts();
+  const reloadProducts = useReloadProducts();
   const [product, setProduct] = useState<Product | undefined>(undefined);
 
   const loadingCards = Array(6)
@@ -26,7 +29,45 @@ export default function Products() {
   const { Modal: NewProductModal, setShow: setShowNewProduct } = useNewProductModal();
   const { Modal: PatchProductModal, setShow: setShowPatchModal, show } = useProductModal(product);
 
-  const handleOnClick = useCallback(
+  const [deleting, setDeleting] = useState(false);
+  const handleOnDelete = async () => {
+    if (!product) return;
+
+    setDeleting(true);
+    try {
+      await http.delete("/product", { data: { id: product.id } });
+      await reloadProducts();
+    } catch (e: any) {
+      alert("Hubo un error.");
+      if (e?.response?.data?.error) {
+        console.error(JSON.stringify(e.response.data.error, null, 2));
+      } else console.log(e);
+    }
+
+    setDeleting(false);
+    setShowDeleteModal(false);
+  };
+  const { Modal: DeleteModal, setShow: setShowDeleteModal } = useReactModal(
+    <>
+      ¿Eliminar
+      <i> {product?.name}</i> ?
+    </>,
+
+    null,
+
+    <>
+      <Button disabled={deleting} variant="secondary" onClick={() => setShowDeleteModal(false)}>
+        Cancelar
+      </Button>
+      <Button disabled={deleting} variant="danger" onClick={handleOnDelete}>
+        Eliminar
+      </Button>
+    </>,
+
+    { verticallyCentered: true, closeButton: !deleting, backdrop: deleting ? "static" : undefined }
+  );
+
+  const handleOnCardClick = useCallback(
     (product: Product) => {
       if (show === false) {
         setProduct(product);
@@ -37,13 +78,22 @@ export default function Products() {
   );
 
   const cards = products?.map((product) => (
-    <Card key={product.id} product={product} handleOnClick={handleOnClick} />
+    <Card
+      deleteButton
+      key={product.id}
+      product={product}
+      handleOnClick={handleOnCardClick}
+      handleOnDelete={(product) => {
+        setProduct(product);
+        setShowDeleteModal(true);
+      }}
+    />
   ));
 
   return person === null ? null : (
     <Fragment>
-      <Container className="mt-3">
-        <Row>
+      <Container>
+        <Row className="mt-3">
           <Col className="d-flex justify-content-center">
             <Button className="d-flex align-items-center" onClick={() => setShowNewProduct(true)}>
               <PlusCircle /> &nbsp;Nuevo producto
@@ -60,6 +110,7 @@ export default function Products() {
 
       {NewProductModal}
       {PatchProductModal}
+      {DeleteModal}
     </Fragment>
   );
 }

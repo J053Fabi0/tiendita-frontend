@@ -4,7 +4,6 @@ import { Fragment } from "react";
 import http from "../http-common";
 import styled from "@emotion/styled";
 import Product from "../types/product.type";
-import { useNavigate } from "react-router-dom";
 import { Formik, Form as FormikForm } from "formik";
 import PostProduct from "../types/PostProduct.type";
 import { useReloadProducts } from "../context/productsContext";
@@ -26,7 +25,6 @@ const Tag = styled(Badge)`
 `;
 
 export default function useNewProductModal(product?: Product) {
-  const navigate = useNavigate();
   const [show, setShow] = useState(false);
   const reloadProducts = useReloadProducts();
   const tagsAndCategories = useTagsAndCategories();
@@ -54,7 +52,6 @@ export default function useNewProductModal(product?: Product) {
     try {
       await http.post("/product", valuesCopy);
       await reloadProducts();
-      navigate("/");
       setShow(false);
     } catch (e) {
       console.error((e as any).response.data.error.description);

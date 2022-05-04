@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { XCircle } from "react-bootstrap-icons";
 import StyledProp from "../../types/styledProp.type";
 import { AllCenteredDiv } from "../../styles/mixins";
 import { Col, Card as CardComponent, Row } from "react-bootstrap";
@@ -13,18 +14,18 @@ const Container = styled(
   "marginBottom": 20,
 
   "& > .card": {
-    backgroundColor: colors.secondary,
-    borderColor: "transparent",
     borderWidth: 1,
+    borderColor: "transparent",
+    backgroundColor: colors.secondary,
   },
 }));
 
 const CardComponentM = styled(CardComponent)(({ theme: { colors } }: any) => ({
   "width": "100%",
   "height": "100%",
+  "cursor": "pointer",
   "flexDirection": "row",
   ":hover": { borderColor: colors.primary },
-  "cursor": "pointer",
   "@media (max-width: 767px)": { flexDirection: "column", height: "auto" },
 }));
 
@@ -50,9 +51,11 @@ const Price = styled(({ className, children }: StyledProp) => (
 }));
 
 const BadgesDiv = styled.div`
-  overflow: auto;
   height: 33px; // 25.5
   max-height: 33px;
+
+  overflow: auto;
+
   @media screen and (max-width: 767px) {
     height: auto;
     max-height: 58px;
@@ -61,4 +64,30 @@ const BadgesDiv = styled.div`
 
 const RowBottom = styled(Row)({ bottom: 15 });
 
-export { Container, CardComponentM, Price, BadgesDiv, RowBottom };
+const CloseButton = styled(XCircle)`
+  border-width: 2px;
+  border-radius: 50%;
+  border-style: solid;
+  border-color: white;
+
+  z-index: 999;
+  cursor: pointer;
+
+  width: 1.6rem;
+  height: 1.6rem;
+
+  right: 0;
+  top: -0.7rem;
+  position: absolute;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-color: white;
+  :hover {
+    background-color: #aaa;
+  }
+`;
+
+export { Container, CardComponentM, Price, BadgesDiv, RowBottom, CloseButton };

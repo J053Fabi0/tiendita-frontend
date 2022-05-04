@@ -6,16 +6,20 @@ import useBreakpoints from "../../hooks/useBreakpoints";
 import { useTags } from "../../context/tagsAndCategoriesContext";
 import randomNumberInterval from "../../utils/randomNumberInterval";
 import { Col, Card as CardComponent, Badge, Placeholder } from "react-bootstrap";
-import { BadgesDiv, CardComponentM, Container, RowBottom } from "./CardComponents";
+import { BadgesDiv, CardComponentM, Container, RowBottom, CloseButton } from "./CardComponents";
 
 function Card({
   loading,
+  deleteButton = false,
   handleOnClick = () => undefined,
+  handleOnDelete = () => undefined,
   product = { description: "", name: "", price: 1, stock: 1, id: 1, tags: [] },
 }: {
   product?: Product;
+  deleteButton?: boolean;
   loading?: boolean | undefined;
-  handleOnClick?: (a: Product) => void;
+  handleOnClick?: (product: Product) => void;
+  handleOnDelete?: (product: Product) => void;
 }) {
   const allTags = useTags();
   const allTagsObject = allTags ? _.transform(allTags, (obj, { id, name }) => (obj[id] = name), {} as any) : {};
@@ -34,10 +38,12 @@ function Card({
   const { lessOrEqualThan } = useBreakpoints();
 
   return (
-    <Container>
+    <Container className="position-relative">
+      {deleteButton ? <CloseButton onClick={() => handleOnDelete(product)} /> : null}
+
       <CardComponentM>
-        <Col onClick={() => handleOnClick(product)} className="position-relative">
-          <CardComponent.Body className="h-100">
+        <Col className="position-relative">
+          <CardComponent.Body onClick={() => handleOnClick(product)} className="h-100">
             {loading ? (
               <CardPlaceholder />
             ) : (
