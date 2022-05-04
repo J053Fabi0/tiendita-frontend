@@ -102,7 +102,7 @@ export default function Products() {
         </Row>
 
         <Row className="mt-3">
-          <Col>
+          <Col className="me-2 me-sm-0 ms-2 ms-sm-0">
             <Row>{products === null ? loadingCards : cards}</Row>
           </Col>
         </Row>
