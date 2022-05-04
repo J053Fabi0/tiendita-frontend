@@ -2,8 +2,8 @@ import { Fragment, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PlusCircle } from "react-bootstrap-icons";
 import { usePerson } from "../../context/personContext";
+import useNewProductModal from "../../hooks/useProductModal";
 import { Button, Col, Container, Row } from "react-bootstrap";
-import useNewProductModal from "../../hooks/useNewProductModal";
 
 export default function Products() {
   const person = usePerson();

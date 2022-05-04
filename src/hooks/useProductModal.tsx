@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Fragment } from "react";
 import http from "../http-common";
 import styled from "@emotion/styled";
+import Product from "../types/product.type";
 import { useNavigate } from "react-router-dom";
 import { Formik, Form as FormikForm } from "formik";
 import PostProduct from "../types/PostProduct.type";
@@ -24,7 +25,7 @@ const Tag = styled(Badge)`
   border: ${(props) => (props.selected ? "2px solid blue" : "2px solid transparent")};
 `;
 
-export default function useNewProductModal() {
+export default function useNewProductModal(product?: Product) {
   const navigate = useNavigate();
   const [show, setShow] = useState(false);
   const reloadProducts = useReloadProducts();
@@ -45,7 +46,7 @@ export default function useNewProductModal() {
     description: Yup.string().optional().max(400, "Debe ser de 400 caracteres o menos."),
   });
 
-  const handleOnSubmit = async (values: PostProduct) => {
+  const handleOnSubmitPost = async (values: PostProduct) => {
     const valuesCopy = { ...values };
     if (values.description === "") delete valuesCopy.description;
     if (values.tags && values.tags.length === 0) delete valuesCopy.tags;
@@ -59,24 +60,51 @@ export default function useNewProductModal() {
       console.error((e as any).response.data.error.description);
     }
   };
+  const handleOnSubmitPatch = async (values: Product) => {
+    const valuesToPatch: any = {};
+    const productTags = product?.tags || [];
+    const { tags: newTags, ...newInfo } = values;
+
+    const newInfosKeys = Object.keys(newInfo);
+    for (const newInfoKey of newInfosKeys)
+      if ((product as any)[newInfoKey] !== (newInfo as any)[newInfoKey])
+        valuesToPatch[newInfoKey] = (newInfo as any)[newInfoKey];
+
+    const deleteTags = productTags.filter((tag) => !newTags.includes(tag));
+    if (deleteTags.length > 0) valuesToPatch.deleteTags = deleteTags;
+
+    const addTags = newTags.filter((tag) => !productTags.includes(tag));
+    if (addTags.length > 0) valuesToPatch.addTags = addTags;
+
+    try {
+      await http.patch("/product", { ...valuesToPatch, id: product!.id });
+      await reloadProducts();
+      setShow(false);
+    } catch (e) {
+      console.error((e as any).response.data.error.description);
+    }
+  };
 
   return {
     Modal: (
       <Modal show={show} onHide={() => setShow(false)} centered size="lg">
         <Modal.Header closeButton>
-          <Modal.Title>Nuevo producto</Modal.Title>
+          <Modal.Title>{product ? "Editar producto" : "Nuevo producto"}</Modal.Title>
         </Modal.Header>
 
         <Formik
           validationSchema={schema}
-          onSubmit={(values, { setSubmitting }) => handleOnSubmit(values).then(() => setSubmitting(false))}
+          onSubmit={(values, { setSubmitting }) =>
+            (product ? handleOnSubmitPatch : handleOnSubmitPost)(values as any).then(() => setSubmitting(false))
+          }
           initialValues={
-            {
+            product ??
+            ({
               name: "",
               tags: [],
               stock: undefined as unknown as number,
               price: undefined as unknown as number,
-            } as PostProduct
+            } as PostProduct)
           }
         >
           {({ values, errors, touched, setValues, handleBlur, handleSubmit, handleChange, isSubmitting }) => (
@@ -196,7 +224,7 @@ export default function useNewProductModal() {
 
               <Modal.Footer>
                 <Button className="cursor-pointer" variant="success" type="submit" disabled={isSubmitting}>
-                  Crear
+                  {product ? "Editar" : "Crear"}
                 </Button>
               </Modal.Footer>
             </FormikForm>
