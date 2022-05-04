@@ -74,7 +74,7 @@ export default function Products() {
         setShowPatchModal(true);
       }
     },
-    [setProduct, setShowNewProduct, show]
+    [setProduct, setShowPatchModal, show]
   );
 
   const cards = products?.map((product) => (

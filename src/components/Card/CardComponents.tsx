@@ -88,6 +88,12 @@ const CloseButton = styled(XCircle)`
   :hover {
     background-color: #aaa;
   }
+
+  @media screen and (max-width: 767px) {
+    top: -0.8rem;
+    width: 1.8rem;
+    height: 1.8rem;
+  }
 `;
 
 export { Container, CardComponentM, Price, BadgesDiv, RowBottom, CloseButton };
