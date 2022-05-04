@@ -1,15 +1,15 @@
+import http from "../../http-common";
 import Card from "../../components/Card/Card";
 import Product from "../../types/product.type";
 import { useNavigate } from "react-router-dom";
 import { PlusCircle } from "react-bootstrap-icons";
+import useReactModal from "../../hooks/useReactModal";
 import { usePerson } from "../../context/personContext";
 import useProductModal from "../../hooks/useProductModal";
-import { useProducts, useReloadProducts } from "../../context/productsContext";
 import useNewProductModal from "../../hooks/useProductModal";
 import { Button, Col, Container, Row } from "react-bootstrap";
 import { Fragment, useCallback, useEffect, useState } from "react";
-import useReactModal from "../../hooks/useReactModal";
-import http from "../../http-common";
+import { useProducts, useReloadProducts } from "../../context/productsContext";
 
 export default function Products() {
   const person = usePerson();

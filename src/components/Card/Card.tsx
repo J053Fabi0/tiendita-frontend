@@ -30,7 +30,7 @@ function Card({
       </Badge>
     ) : (
       <Placeholder key={tagID} animation="glow">
-        <Placeholder style={{ borderRadius: 5 }} xs={randomNumberInterval(2, 4)} bg="primary" />{" "}
+        <Placeholder style={{ borderRadius: 5 }} xs={randomNumberInterval(2, 3)} bg="secondary" />{" "}
       </Placeholder>
     )
   );

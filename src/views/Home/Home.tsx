@@ -11,13 +11,11 @@ import { useProducts } from "../../context/productsContext";
 import useNewSaleModal from "../../hooks/useNewSaleModal/useNewSaleModal";
 
 export default function Home() {
-  const products = useProducts();
-  const loadingCards = Array(6)
-    .fill(0)
-    .map((_, i) => <Card key={i} loading={true}></Card>);
   const person = usePerson();
+  const products = useProducts();
+  const loadingCards = [0, 0, 0, 0, 0, 0].map((_, i) => <Card key={i} loading={true}></Card>);
 
-  const handleOnSubmit = async (values: Values, product: Product) => {
+  const handleNewSale = async (values: Values, product: Product) => {
     if (person === null) return;
 
     const a: any = {
@@ -46,7 +44,7 @@ export default function Home() {
     }
   };
 
-  const { Modal: NewSaleModal, setShow, show, setProduct, product } = useNewSaleModal(handleOnSubmit, onEdit);
+  const { Modal: NewSaleModal, setShow, show, setProduct, product } = useNewSaleModal(handleNewSale, onEdit);
   const { Modal: PatchProductModal, setShow: setShowPatchModal } = useProductModal(product);
 
   function onEdit() {
