@@ -1,10 +1,10 @@
 import _ from "lodash";
 import { memo } from "react";
 import CardPlaceholder from "./CardPlaceholder";
-import Product from "../../../types/product.type";
-import useBreakpoints from "../../../hooks/useBreakpoints";
-import { useTags } from "../../../context/tagsAndCategoriesContext";
-import randomNumberInterval from "../../../utils/randomNumberInterval";
+import Product from "../../types/product.type";
+import useBreakpoints from "../../hooks/useBreakpoints";
+import { useTags } from "../../context/tagsAndCategoriesContext";
+import randomNumberInterval from "../../utils/randomNumberInterval";
 import { Col, Card as CardComponent, Badge, Placeholder } from "react-bootstrap";
 import { BadgesDiv, CardComponentM, Container, RowBottom } from "./CardComponents";
 

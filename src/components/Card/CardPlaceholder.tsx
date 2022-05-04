@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { BadgesDiv, Price } from "./CardComponents";
 import { Placeholder, Card } from "react-bootstrap";
-import randomNumberInterval from "../../../utils/randomNumberInterval";
+import randomNumberInterval from "../../utils/randomNumberInterval";
 
 function CardPlaceholder() {
   return (

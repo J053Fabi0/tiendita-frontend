@@ -1,7 +1,7 @@
-import Card from "./Card/Card";
 import http from "../../http-common";
 import Filters from "./Filters/Filters";
 import Values from "../../types/values.type";
+import Card from "../../components/Card/Card";
 import { Fragment, useCallback } from "react";
 import Product from "../../types/product.type";
 import { Row, Col, Container } from "react-bootstrap";

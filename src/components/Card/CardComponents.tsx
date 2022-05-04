@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
-import StyledProp from "../../../types/styledProp.type";
-import { AllCenteredDiv } from "../../../styles/mixins";
+import StyledProp from "../../types/styledProp.type";
+import { AllCenteredDiv } from "../../styles/mixins";
 import { Col, Card as CardComponent, Row } from "react-bootstrap";
 
 const Container = styled(
