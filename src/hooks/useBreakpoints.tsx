@@ -1,6 +1,6 @@
 import useMediaQuery from "./useMediaQuery";
 
-const useBreakpoints = () => {
+export default function useBreakpoints() {
   const toReturn = {
     lessOrEqualThan: {
       xSmall: useMediaQuery("(max-width: 575px)", true),
@@ -31,6 +31,4 @@ const useBreakpoints = () => {
       xxLarge: toReturn.lessOrEqualThan.xxLarge && toReturn.greaterOrEqualThan.xxLarge,
     },
   };
-};
-
-export default useBreakpoints;
+}

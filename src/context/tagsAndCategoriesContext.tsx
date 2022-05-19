@@ -5,11 +5,11 @@ import Category from "../types/category.type";
 import { useAuthTokenReady } from "./personContext";
 import { useContext, createContext, useState, useEffect } from "react";
 
-const TagsAndCategoriesContext = createContext<Category[] | null>(null);
 const TagsContext = createContext<Tag[] | null>(null);
+const TagsAndCategoriesContext = createContext<Category[] | null>(null);
 
-export const useTagsAndCategories = () => useContext(TagsAndCategoriesContext);
 export const useTags = () => useContext(TagsContext);
+export const useTagsAndCategories = () => useContext(TagsAndCategoriesContext);
 
 export function TagsAndCategoriesProvider(a: { children: any }) {
   const authTokenReady = useAuthTokenReady();
