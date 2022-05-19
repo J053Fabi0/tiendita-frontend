@@ -1,22 +1,17 @@
 import http from "../../http-common";
 import Card from "../../components/Card/Card";
 import Product from "../../types/product.type";
-import { useNavigate } from "react-router-dom";
 import { PlusCircle } from "react-bootstrap-icons";
 import useReactModal from "../../hooks/useReactModal";
-import { usePerson } from "../../context/personContext";
+import { Fragment, useCallback, useState } from "react";
 import useProductModal from "../../hooks/useProductModal";
 import useNewProductModal from "../../hooks/useProductModal";
+import useRedirectIfRole from "../../hooks/useRedirectIfRole";
 import { Button, Col, Container, Row } from "react-bootstrap";
-import { Fragment, useCallback, useEffect, useState } from "react";
 import { useProducts, useRemoveProductLocally } from "../../context/productsContext";
 
 export default function Products() {
-  const person = usePerson();
-  const navigate = useNavigate();
-  useEffect(() => {
-    if (person?.role === "employee") navigate("/");
-  }, [person, navigate]);
+  const confirmed = useRedirectIfRole();
 
   const products = useProducts();
   const removeProductLocally = useRemoveProductLocally();
@@ -90,7 +85,7 @@ export default function Products() {
     />
   ));
 
-  return person === null ? null : (
+  return !confirmed ? null : (
     <Fragment>
       <Container>
         <Row className="mt-3">
