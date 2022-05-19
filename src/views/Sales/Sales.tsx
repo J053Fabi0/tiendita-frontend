@@ -1,34 +1,30 @@
 import http from "../../http-common";
-import sleep from "../../utils/sleep";
 import Sale from "../../types/sale.type";
 import addCero from "../../utils/addCero";
 import CustomToggle from "./CustomToggle";
 import DatePicker from "react-date-picker";
+import useLoadData from "../../hooks/useLoadData";
+import { Fragment, useCallback, useState } from "react";
 import { useProducts } from "../../context/productsContext";
 import useRedirectIfRole from "../../hooks/useRedirectIfRole";
-import { useAuthTokenReady } from "../../context/personContext";
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { useFromState, useSalesState } from "../../context/salesContext";
 import { Accordion, Card, Col, Container, Nav, Row, Spinner, Table } from "react-bootstrap";
-import useLoadData from "../../hooks/useLoadData";
 
 export default function Sales() {
   const confirmed = useRedirectIfRole();
 
-  const [from, setFrom] = useState(new Date());
   const [activeTab, setActiveTab] = useState("");
 
+  const [from, setFrom] = useFromState();
+  const [sales, setSales] = useSalesState();
+  const [loadingSales, setLoadingSales] = useState(sales.length === 0);
+
+  useLoadData([from], setSales, () => http.get<{ message: Sale[] }>("/sales", { params: { from: +from } }), {
+    conditionToStart: confirmed,
+    loadingCB: (loading) => setLoadingSales(loading),
+  });
+
   const products = useProducts();
-  const authTokenReady = useAuthTokenReady();
-  const [sales, setSales] = useState<Sale[]>([]);
-  const [loadingSales, setLoadingSales] = useState(true);
-
-  useLoadData(
-    [authTokenReady, confirmed, from],
-    setSales,
-    () => http.get<{ message: Sale[] }>("/sales", { params: { from: +from } }),
-    { conditionToStart: confirmed, defaultValue: [], loadingCB: (loading) => setLoadingSales(loading) }
-  );
-
   const getProductByID = useCallback((id) => products?.find(({ id: thisID }) => thisID === id), [products]);
 
   const handleTabSelect = (tab: string | null) => {

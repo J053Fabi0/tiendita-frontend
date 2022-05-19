@@ -5,7 +5,7 @@ import { useAuthTokenReady } from "./personContext";
 import { useContext, createContext, useState, useEffect, useCallback } from "react";
 
 const ProductsContext = createContext<Product[] | null>(null);
-const RemoveProductLocallyContext = createContext<(id: number) => void>((id: number) => undefined);
+const RemoveProductLocallyContext = createContext<(id: number) => void>((_: number) => undefined);
 const ReloadProductContext = createContext<(id: number) => Promise<boolean>>(() => Promise.resolve(false));
 const ReloadProductsContext = createContext<() => Promise<void>>(undefined as unknown as () => Promise<void>);
 
@@ -32,6 +32,7 @@ export function ProductsProvider(a: { children: any }) {
 
     setProducts(products);
   }, [authTokenReady]);
+
   useEffect(() => void reloadProducts(), [reloadProducts]);
 
   const reloadProduct = useCallback(

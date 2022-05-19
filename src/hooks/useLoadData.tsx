@@ -29,7 +29,7 @@ interface Params<message> {
 
 /**
  * Reduce the code necessary to interact with the backend.
- * @param deps The dependecies for the useEffect.
+ * @param deps The dependecies for the useEffect. authTokenReady is not necessary.
  * @param setter The setter of the data gathered.
  * @param httpMethod A function that returns the httpMethod you want to call.
  */
@@ -67,5 +67,5 @@ export default function useLoadData<message>(
       setter(message);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps);
+  }, [authTokenReady, ...deps]);
 }

@@ -8,31 +8,34 @@ import { PersonsProvider } from "./context/personContext";
 import { ProductsProvider } from "./context/productsContext";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import { TagsAndCategoriesProvider } from "./context/tagsAndCategoriesContext";
+import { SalesProvider } from "./context/salesContext";
 
 export default function App() {
   return (
     <PersonsProvider>
       <ProductsProvider>
         <TagsAndCategoriesProvider>
-          <ThemeProvider theme={theme}>
-            <BrowserRouter>
-              <Navbar
-                links={[
-                  { path: "/", title: "Ventas" },
-                  { path: "/productos", title: "Productos", onlyAdmins: true },
-                  { path: "/ventas", title: "Ventas", onlyAdmins: true },
-                ]}
-              />
+          <SalesProvider>
+            <ThemeProvider theme={theme}>
+              <BrowserRouter>
+                <Navbar
+                  links={[
+                    { path: "/", title: "Ventas" },
+                    { path: "/productos", title: "Productos", onlyAdmins: true },
+                    { path: "/ventas", title: "Ventas", onlyAdmins: true },
+                  ]}
+                />
 
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/productos" element={<Products />} />
-                <Route path="/ventas" element={<Sales />} />
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/productos" element={<Products />} />
+                  <Route path="/ventas" element={<Sales />} />
 
-                <Route path="*" element={<Home />} />
-              </Routes>
-            </BrowserRouter>
-          </ThemeProvider>
+                  <Route path="*" element={<Home />} />
+                </Routes>
+              </BrowserRouter>
+            </ThemeProvider>
+          </SalesProvider>
         </TagsAndCategoriesProvider>
       </ProductsProvider>
     </PersonsProvider>
