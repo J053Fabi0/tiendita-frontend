@@ -20,7 +20,7 @@ export default function Navbar({ links }: Props) {
         <Navb.Collapse>
           <Nav className="me-auto">
             {links
-              .filter(({ onlyAdmins }) => (person?.role === "employee" && onlyAdmins ? false : true))
+              .filter(({ onlyAdmins }) => ((!person || person.role === "employee") && onlyAdmins ? false : true))
               .map(({ path, title }) => (
                 <LinkContainer to={path} key={path}>
                   <Nav.Link>{title}</Nav.Link>
