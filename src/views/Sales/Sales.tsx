@@ -9,6 +9,7 @@ import useRedirectIfRole from "../../hooks/useRedirectIfRole";
 import { useAuthTokenReady } from "../../context/personContext";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { Accordion, Card, Col, Container, Nav, Row, Spinner, Table } from "react-bootstrap";
+import useLoadData from "../../hooks/useLoadData";
 
 export default function Sales() {
   const confirmed = useRedirectIfRole();
@@ -21,27 +22,12 @@ export default function Sales() {
   const [sales, setSales] = useState<Sale[]>([]);
   const [loadingSales, setLoadingSales] = useState(true);
 
-  useEffect(() => {
-    (async () => {
-      if (!authTokenReady || !confirmed) {
-        setSales([]);
-        return;
-      }
-
-      setLoadingSales(true);
-      let message: null | Sale[] = null;
-      while (message === null)
-        try {
-          message = (await http.get<{ message: Sale[] }>("/sales", { params: { from: +from } })).data.message;
-        } catch (e) {
-          console.error(e);
-          await sleep(1000);
-        }
-
-      setLoadingSales(false);
-      setSales(message);
-    })();
-  }, [authTokenReady, confirmed, from]);
+  useLoadData(
+    [authTokenReady, confirmed, from],
+    setSales,
+    () => http.get<{ message: Sale[] }>("/sales", { params: { from: +from } }),
+    { conditionToStart: confirmed, defaultValue: [], loadingCB: (loading) => setLoadingSales(loading) }
+  );
 
   const getProductByID = useCallback((id) => products?.find(({ id: thisID }) => thisID === id), [products]);
 
