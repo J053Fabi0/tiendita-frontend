@@ -20,7 +20,7 @@ export const useLogOut = () => useContext(LogOutContext);
 export const useAuthToken = () => useContext(AuthTokenContext);
 export const useAuthTokenReady = () => useContext(AuthTokenReadyContext);
 
-export function PersonsProvider(a: { children: any }) {
+export function PersonProvider(a: { children: any }) {
   const [error, setError] = useState<null | string>(null);
   const [person, setPerson] = useLocalStorage<Person | null>("person", null);
   const [authToken, setAuthToken] = useCookie("authtoken", "", { secure: true });

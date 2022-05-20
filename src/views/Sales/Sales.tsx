@@ -3,10 +3,12 @@ import Sale from "../../types/sale.type";
 import addCero from "../../utils/addCero";
 import CustomToggle from "./CustomToggle";
 import DatePicker from "react-date-picker";
+import Person from "../../types/Person.type";
 import useLoadData from "../../hooks/useLoadData";
 import { Fragment, useCallback, useState } from "react";
 import { useProducts } from "../../context/productsContext";
 import useRedirectIfRole from "../../hooks/useRedirectIfRole";
+import { usePersonsState } from "../../context/personsContext";
 import { useFromState, useSalesState } from "../../context/salesContext";
 import { Accordion, Card, Col, Container, Nav, Row, Spinner, Table } from "react-bootstrap";
 
@@ -17,8 +19,14 @@ export default function Sales() {
 
   const [from, setFrom] = useFromState();
   const [sales, setSales] = useSalesState();
+  const [persons, setPersons] = usePersonsState();
   const [loadingSales, setLoadingSales] = useState(sales.length === 0);
+  const [loadingPersons, setLoadingPersons] = useState(persons.length === 0);
 
+  useLoadData([], setPersons, () => http.get<{ message: Person[] }>("/persons"), {
+    conditionToStart: confirmed,
+    loadingCB: (loading) => setLoadingPersons(loading),
+  });
   useLoadData([from], setSales, () => http.get<{ message: Sale[] }>("/sales", { params: { from: +from } }), {
     conditionToStart: confirmed,
     loadingCB: (loading) => setLoadingSales(loading),
@@ -26,6 +34,7 @@ export default function Sales() {
 
   const products = useProducts();
   const getProductByID = useCallback((id) => products?.find(({ id: thisID }) => thisID === id), [products]);
+  const getPersonByID = useCallback((id) => persons?.find(({ id: thisID }) => thisID === id), [persons]);
 
   const handleTabSelect = (tab: string | null) => {
     if (tab === null) return;
@@ -86,25 +95,29 @@ export default function Sales() {
                 </thead>
                 <tbody>
                   {sales.map((sale) => {
-                    const product = getProductByID(sale.product);
                     const date = new Date(sale.date);
+                    const product = getProductByID(sale.product);
+                    const total = sale.quantity * (sale.specialPrice ?? product?.price ?? 0);
+
                     const dateString =
                       `${addCero(date.getDate())}/${addCero(date.getMonth())}/` +
                       `${date.getFullYear().toString().substring(2)} ` +
                       `${addCero(date.getHours())}:${addCero(date.getMinutes())}`;
+
                     return (
                       <tr key={sale.id}>
                         <td>{dateString}</td>
-                        <td>{sale.person}</td>
+                        <td>{loadingPersons ? "Cargando..." : getPersonByID(sale.person)?.name}</td>
                         <td>{!product ? "Cargando..." : product.name}</td>
                         <td>{sale.quantity}</td>
+                        <td>${!product && !sale.specialPrice ? "Cargando..." : total}</td>
                         <td>
-                          $
-                          {!product && !sale.specialPrice
-                            ? "Cargando..."
-                            : sale.quantity * (sale.specialPrice ?? product!.price)}
+                          {sale.cash !== total
+                            ? sale.cash === 0
+                              ? "Todo"
+                              : `$${total - sale.cash} en efectivo`
+                            : "No"}
                         </td>
-                        <td>{sale.specialPrice ? "$" + sale.specialPrice : "No"}</td>
                       </tr>
                     );
                   })}

@@ -9,7 +9,7 @@ export const useFromState = () => useContext(FromStateContext);
 
 export function SalesProvider(a: { children: any }) {
   const salesState = useState<Sale[]>([]);
-  const fromState = useState(new Date());
+  const fromState = useState(new Date(new Date().setHours(0, 0, 0, 0)));
 
   return (
     <SalesStateContext.Provider value={salesState}>
