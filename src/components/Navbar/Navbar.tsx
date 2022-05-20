@@ -12,7 +12,7 @@ export default function Navbar({ links }: Props) {
   const person = usePerson();
   const Title = styled(Navb.Brand)({ paddingBottom: "0.5rem" });
 
-  return (
+  return person === null ? null : (
     <Navb expand="lg" bg="dark" variant="dark">
       <Container>
         <Title>Tiendita</Title>
