@@ -11,20 +11,23 @@ import { useContext, createContext, useState } from "react";
 import { Alert, Button, Col, Form, InputGroup, Modal, Row } from "react-bootstrap";
 
 const AuthTokenContext = createContext<string>("");
+const IsAdminContext = createContext<boolean>(false);
 const PersonContext = createContext<Person | null>(null);
 const AuthTokenReadyContext = createContext<boolean>(false);
 const LogOutContext = createContext<() => void>(null as any);
 
 export const usePerson = () => useContext(PersonContext);
 export const useLogOut = () => useContext(LogOutContext);
+export const useIsAdmin = () => useContext(IsAdminContext);
 export const useAuthToken = () => useContext(AuthTokenContext);
 export const useAuthTokenReady = () => useContext(AuthTokenReadyContext);
 
 export function PersonProvider(a: { children: any }) {
+  const [isAdmin, setIsAdmin] = useState(false);
   const [error, setError] = useState<null | string>(null);
+  const [authTokenReady, setAuthTokenReady] = useState<boolean>(false);
   const [person, setPerson] = useLocalStorage<Person | null>("person", null);
   const [authToken, setAuthToken] = useCookie("authtoken", "", { secure: true });
-  const [authTokenReady, setAuthTokenReady] = useState<boolean>(false);
 
   useEffect(() => {
     if (authToken) {
@@ -33,6 +36,8 @@ export function PersonProvider(a: { children: any }) {
     } else {
       delete http.defaults.headers.common["Authorization"];
       setAuthTokenReady(false);
+      setPerson(null);
+      setError(null);
     }
   }, [authToken]);
 
@@ -134,23 +139,27 @@ export function PersonProvider(a: { children: any }) {
     </Modal>
   );
 
+  useEffect(() => setIsAdmin(person !== null && person.role === "admin"), [person]);
+
   return (
     <PersonContext.Provider value={person}>
-      <AuthTokenReadyContext.Provider value={authTokenReady}>
-        <AuthTokenContext.Provider value={authToken}>
-          <LogOutContext.Provider
-            value={() => {
-              setShow(true);
-              setPerson(null);
-              setAuthToken("");
-            }}
-          >
-            {/**/}
-            {SignInModal}
-            {a.children}
-          </LogOutContext.Provider>
-        </AuthTokenContext.Provider>
-      </AuthTokenReadyContext.Provider>
+      <AuthTokenContext.Provider value={authToken}>
+        <AuthTokenReadyContext.Provider value={authTokenReady}>
+          <IsAdminContext.Provider value={isAdmin}>
+            <LogOutContext.Provider
+              value={() => {
+                setShow(true);
+                setPerson(null);
+                setAuthToken("");
+              }}
+            >
+              {/**/}
+              {SignInModal}
+              {a.children}
+            </LogOutContext.Provider>
+          </IsAdminContext.Provider>
+        </AuthTokenReadyContext.Provider>
+      </AuthTokenContext.Provider>
     </PersonContext.Provider>
   );
 }
