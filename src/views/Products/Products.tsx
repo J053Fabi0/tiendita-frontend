@@ -4,14 +4,16 @@ import Product from "../../types/product.type";
 import { PlusCircle } from "react-bootstrap-icons";
 import useReactModal from "../../hooks/useReactModal";
 import { Fragment, useCallback, useState } from "react";
+import { useIsAdmin } from "../../context/personContext";
 import useProductModal from "../../hooks/useProductModal";
 import useNewProductModal from "../../hooks/useProductModal";
-import useRedirectIfRole from "../../hooks/useRedirectIfRole";
+import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
 import { Button, Col, Container, Row } from "react-bootstrap";
 import { useProducts, useRemoveProductLocally } from "../../context/productsContext";
 
 export default function Products() {
-  const confirmed = useRedirectIfRole();
+  const isAdmin = useIsAdmin();
+  useRedirectIfTrue(!isAdmin);
 
   const products = useProducts();
   const removeProductLocally = useRemoveProductLocally();
@@ -85,7 +87,7 @@ export default function Products() {
     />
   ));
 
-  return !confirmed ? null : (
+  return !isAdmin ? null : (
     <Fragment>
       <Container>
         <Row className="mt-3">

@@ -6,30 +6,36 @@ import DatePicker from "react-date-picker";
 import Person from "../../types/Person.type";
 import useLoadData from "../../hooks/useLoadData";
 import { Fragment, useCallback, useState } from "react";
+import { useIsAdmin } from "../../context/personContext";
 import { useProducts } from "../../context/productsContext";
-import useRedirectIfRole from "../../hooks/useRedirectIfRole";
+import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
 import { usePersonsState } from "../../context/personsContext";
-import { useFromState, useSalesState } from "../../context/salesContext";
 import { Accordion, Card, Col, Container, Nav, Row, Spinner, Table } from "react-bootstrap";
+import {
+  useFrom,
+  useFromUpdate,
+  useSalesState,
+  useLoadingSales,
+  useFirstSalesLoad,
+} from "../../context/salesContext";
 
 export default function Sales() {
-  const confirmed = useRedirectIfRole();
+  const isAdmin = useIsAdmin();
+  useRedirectIfTrue(!isAdmin);
+  useFirstSalesLoad()();
 
   const [activeTab, setActiveTab] = useState("");
 
-  const [from, setFrom] = useFromState();
-  const [sales, setSales] = useSalesState();
+  const from = useFrom();
+  const sales = useSalesState();
+  const setFrom = useFromUpdate();
+  const loadingSales = useLoadingSales();
   const [persons, setPersons] = usePersonsState();
-  const [loadingSales, setLoadingSales] = useState(sales.length === 0);
   const [loadingPersons, setLoadingPersons] = useState(persons.length === 0);
 
-  useLoadData([], setPersons, () => http.get<{ message: Person[] }>("/persons"), {
-    conditionToStart: confirmed,
+  useLoadData([isAdmin], setPersons, () => http.get<{ message: Person[] }>("/persons"), {
+    conditionToStart: isAdmin,
     loadingCB: (loading) => setLoadingPersons(loading),
-  });
-  useLoadData([from], setSales, () => http.get<{ message: Sale[] }>("/sales", { params: { from: +from } }), {
-    conditionToStart: confirmed,
-    loadingCB: (loading) => setLoadingSales(loading),
   });
 
   const products = useProducts();
@@ -41,7 +47,7 @@ export default function Sales() {
     setActiveTab(tab !== activeTab ? tab : "");
   };
 
-  return !confirmed ? null : (
+  return !isAdmin ? null : (
     <Fragment>
       <Container>
         <Row className="mt-3">
@@ -98,7 +104,6 @@ export default function Sales() {
                     const date = new Date(sale.date);
                     const product = getProductByID(sale.product);
                     const total = sale.quantity * (sale.specialPrice ?? product?.price ?? 0);
-
                     const dateString =
                       `${addCero(date.getDate())}/${addCero(date.getMonth())}/` +
                       `${date.getFullYear().toString().substring(2)} ` +

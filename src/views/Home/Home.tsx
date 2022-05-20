@@ -9,12 +9,12 @@ import { usePerson } from "../../context/personContext";
 import useProductModal from "../../hooks/useProductModal";
 import useNewSaleModal from "../../hooks/useNewSaleModal/useNewSaleModal";
 import { useProducts, useReloadProduct } from "../../context/productsContext";
-import { useSalesState } from "../../context/salesContext";
+import { useReloadSales } from "../../context/salesContext";
 
 export default function Home() {
   const person = usePerson();
   const products = useProducts();
-  const [, setSales] = useSalesState();
+  const reloadSales = useReloadSales();
   const reloadProduct = useReloadProduct();
   const loadingCards = [1, 2, 3, 4, 5, 6].map((_, i) => <Card key={i} loading={true}></Card>);
 
@@ -42,8 +42,9 @@ export default function Home() {
     try {
       await http.post("/sale", a);
       await reloadProduct(product.id);
+
+      reloadSales();
       setShow(false);
-      setSales([]);
     } catch (e) {
       console.error((e as any).response.data.error.description);
     }
@@ -70,7 +71,7 @@ export default function Home() {
     <Card key={product.id} product={product} handleOnClick={handleOnClick} />
   ));
 
-  return (
+  return person === null ? null : (
     <Fragment>
       <Container className="mt-3">
         <Row>

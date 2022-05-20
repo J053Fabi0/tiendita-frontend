@@ -2,23 +2,24 @@ import theme from "./styles/theme";
 import Home from "./views/Home/Home";
 import { Navbar } from "./components";
 import Sales from "./views/Sales/Sales";
-import { ThemeProvider } from "@emotion/react";
 import Products from "./views/Products/Products";
-import { PersonProvider } from "./context/personContext";
-import { ProductsProvider } from "./context/productsContext";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
-import { TagsAndCategoriesProvider } from "./context/tagsAndCategoriesContext";
+
+import { ThemeProvider } from "@emotion/react";
 import { SalesProvider } from "./context/salesContext";
+import { PersonProvider } from "./context/personContext";
 import { PersonsProvider } from "./context/personsContext";
+import { ProductsProvider } from "./context/productsContext";
+import { TagsAndCategoriesProvider } from "./context/tagsAndCategoriesContext";
 
 export default function App() {
   return (
-    <PersonProvider>
-      <ProductsProvider>
-        <TagsAndCategoriesProvider>
+    <ThemeProvider theme={theme}>
+      <PersonProvider>
+        <ProductsProvider>
           <SalesProvider>
             <PersonsProvider>
-              <ThemeProvider theme={theme}>
+              <TagsAndCategoriesProvider>
                 <BrowserRouter>
                   <Navbar
                     links={[
@@ -36,11 +37,11 @@ export default function App() {
                     <Route path="*" element={<Home />} />
                   </Routes>
                 </BrowserRouter>
-              </ThemeProvider>
+              </TagsAndCategoriesProvider>
             </PersonsProvider>
           </SalesProvider>
-        </TagsAndCategoriesProvider>
-      </ProductsProvider>
-    </PersonProvider>
+        </ProductsProvider>
+      </PersonProvider>
+    </ThemeProvider>
   );
 }
