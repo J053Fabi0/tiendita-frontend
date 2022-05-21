@@ -21,23 +21,20 @@ export default function Home() {
   const handleNewSale = async (values: Values, product: Product) => {
     if (person === null) return;
 
-    const a: any = {
-      person: person.id,
-      quantity: values.quantity,
-      date: (() => {
-        const newDate = new Date(values.date);
-        const [hour, minute] = values.time.split(":").map((s) => parseInt(s));
-        newDate.setHours(hour, minute, 0, 0);
-        return +newDate;
-      })(),
-      cash: (() => {
-        if (values.cardExists) return values.zeroCash ? 0 : values.cash;
-        else return product.price * values.quantity;
-      })(),
-      product: product.id,
-    };
+    const a: any = { person: person.id, quantity: values.quantity, product: product.id };
+
     if (values.specialPriceExists)
       a.specialPrice = values.specialPrice * (values.specialPriceTotal ? 1 : values.quantity);
+
+    a.date = (() => {
+      const [hour, minute] = values.time.split(":").map((s) => parseInt(s));
+      return new Date(values.date).setHours(hour, minute, 0, 0);
+    })();
+
+    a.cash = (() => {
+      if (values.cardExists) return values.zeroCash ? 0 : values.cash;
+      else return a.specialPrice ?? product.price * values.quantity;
+    })();
 
     try {
       await http.post("/sale", a);
