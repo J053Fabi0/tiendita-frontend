@@ -45,7 +45,7 @@ export function SalesProvider(a: { children: any }) {
 
   const firstSalesLoad = useCallback(() => {
     if (!mayLoad) setMayLoad(true);
-  }, [setMayLoad]);
+  }, [setMayLoad, mayLoad]);
 
   return (
     <SalesContext.Provider value={sales}>

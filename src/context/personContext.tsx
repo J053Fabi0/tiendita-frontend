@@ -39,7 +39,7 @@ export function PersonProvider(a: { children: any }) {
       setPerson(null);
       setError(null);
     }
-  }, [authToken]);
+  }, [authToken, setPerson]);
 
   const schema = Yup.object().shape({
     username: Yup.string().required("Requerido."),
