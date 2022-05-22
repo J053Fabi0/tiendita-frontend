@@ -1,5 +1,4 @@
 import http from "../../http-common";
-import Sale from "../../types/sale.type";
 import addCero from "../../utils/addCero";
 import CustomToggle from "./CustomToggle";
 import DatePicker from "react-date-picker";
@@ -87,48 +86,59 @@ export default function Sales() {
               )}
             </Col>
           ) : (
-            <Col xs={12} className="me-2 me-sm-0 ms-2 ms-sm-0 overflow-auto">
-              <Table striped bordered hover={false} size="sm">
-                <thead>
-                  <tr>
-                    <th>Fecha</th>
-                    <th>Persona</th>
-                    <th>Producto</th>
-                    <th>Cantidad</th>
-                    <th>Total</th>
-                    <th>Tarjeta</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sales.map((sale) => {
-                    const date = new Date(sale.date);
-                    const product = getProductByID(sale.product);
-                    const total = sale.quantity * (sale.specialPrice ?? product?.price ?? 0);
-                    const dateString =
-                      `${addCero(date.getDate())}/${addCero(date.getMonth())}/` +
-                      `${date.getFullYear().toString().substring(2)} ` +
-                      `${addCero(date.getHours())}:${addCero(date.getMinutes())}`;
+            <>
+              <Col xs={12} className="overflow-auto">
+                <Table striped bordered hover={false} size="sm">
+                  <thead>
+                    <tr>
+                      <th>Fecha</th>
+                      <th>Persona</th>
+                      <th>Producto</th>
+                      <th>Cantidad</th>
+                      <th>Total</th>
+                      <th>Tarjeta</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sales.map((sale) => {
+                      const date = new Date(sale.date);
+                      const product = getProductByID(sale.product);
+                      const total = sale.specialPrice ?? sale.quantity * (product?.price ?? 0);
+                      const dateString =
+                        `${addCero(date.getDate())}/${addCero(date.getMonth())}/` +
+                        `${date.getFullYear().toString().substring(2)} ` +
+                        `${addCero(date.getHours())}:${addCero(date.getMinutes())}`;
 
-                    return (
-                      <tr key={sale.id}>
-                        <td>{dateString}</td>
-                        <td>{loadingPersons ? "Cargando..." : getPersonByID(sale.person)?.name}</td>
-                        <td>{!product ? "Cargando..." : product.name}</td>
-                        <td>{sale.quantity}</td>
-                        <td>${!product && !sale.specialPrice ? "Cargando..." : total}</td>
-                        <td>
-                          {sale.cash !== total
-                            ? sale.cash === 0
-                              ? "Todo"
-                              : `$${total - sale.cash} en efectivo`
-                            : "No"}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </Table>
-            </Col>
+                      return (
+                        <tr key={sale.id}>
+                          <td>{dateString}</td>
+                          <td>{loadingPersons ? "Cargando..." : getPersonByID(sale.person)?.name}</td>
+                          <td>{!product ? "Cargando..." : product.name}</td>
+                          <td>{sale.quantity}</td>
+                          <td>${!product && !sale.specialPrice ? "Cargando..." : total}</td>
+                          <td>
+                            {sale.cash !== total
+                              ? sale.cash === 0
+                                ? "Todo"
+                                : `$${total - sale.cash} en efectivo`
+                              : "No"}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </Table>
+              </Col>
+
+              <Col xs={12} className="w-100 d-flex justify-content-end">
+                <b>Total:</b>&#8201;$
+                {sales?.reduce(
+                  (prev, sale) =>
+                    prev + (sale.specialPrice ?? sale.quantity * (getProductByID(sale.product)?.price ?? 0)),
+                  0
+                )}
+              </Col>
+            </>
           )}
         </Row>
       </Container>
