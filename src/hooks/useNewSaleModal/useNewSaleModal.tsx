@@ -159,6 +159,7 @@ export default function useNewSaleModal(
                         <Form.Control
                           type="number"
                           name="quantity"
+                          autoFocus={true}
                           onBlur={handleBlur}
                           style={{ zIndex: 0 }}
                           value={values.quantity}
