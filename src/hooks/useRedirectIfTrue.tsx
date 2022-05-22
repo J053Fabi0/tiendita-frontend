@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 /**
@@ -8,5 +9,7 @@ import { useNavigate } from "react-router-dom";
 export default function useRedirectIfTrue(condition: boolean, path = "/") {
   const navigate = useNavigate();
 
-  if (condition) navigate(path);
+  useEffect(() => {
+    if (condition) navigate(path);
+  }, [path, condition, navigate]);
 }
