@@ -3,6 +3,7 @@ import Sale from "../types/sale.type";
 import { useIsAdmin } from "./personContext";
 import useLoadData from "../hooks/useLoadData";
 import { useContext, createContext, useState, Dispatch, SetStateAction, useCallback } from "react";
+import useMayLoad from "../hooks/useMayLoad";
 
 const SalesReloaderContext = createContext(0);
 const SalesContext = createContext<Sale[]>([]);
@@ -22,7 +23,7 @@ export const useFirstSalesLoad = () => useContext(FirstSalesLoadContext);
 
 export function SalesProvider(a: { children: any }) {
   const isAdmin = useIsAdmin();
-  const [mayLoad, setMayLoad] = useState(false);
+  const [mayLoad, firstSalesLoad] = useMayLoad();
   const [sales, setSales] = useState<Sale[]>([]);
   const [reloaderState, setReloaderState] = useState(Date.now());
   const [loadingSales, setLoadingSales] = useState(sales.length === 0);
@@ -42,10 +43,6 @@ export function SalesProvider(a: { children: any }) {
       loadingCB: (loading) => setLoadingSales(loading),
     }
   );
-
-  const firstSalesLoad = useCallback(() => {
-    if (!mayLoad) setMayLoad(true);
-  }, [setMayLoad, mayLoad]);
 
   return (
     <SalesContext.Provider value={sales}>
