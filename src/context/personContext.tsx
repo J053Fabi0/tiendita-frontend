@@ -23,11 +23,11 @@ export const useAuthToken = () => useContext(AuthTokenContext);
 export const useAuthTokenReady = () => useContext(AuthTokenReadyContext);
 
 export function PersonProvider(a: { children: any }) {
-  const [isAdmin, setIsAdmin] = useState(false);
   const [error, setError] = useState<null | string>(null);
   const [authTokenReady, setAuthTokenReady] = useState<boolean>(false);
   const [person, setPerson] = useLocalStorage<Person | null>("person", null);
   const [authToken, setAuthToken] = useCookie("authtoken", "", { secure: true });
+  const [isAdmin, setIsAdmin] = useState(person !== null && person.role === "admin");
 
   useEffect(() => {
     if (authToken) {
@@ -139,7 +139,10 @@ export function PersonProvider(a: { children: any }) {
     </Modal>
   );
 
-  useEffect(() => setIsAdmin(person !== null && person.role === "admin"), [person]);
+  useEffect(() => {
+    const tempIsAdmin = person !== null && person.role === "admin";
+    if (tempIsAdmin !== isAdmin) setIsAdmin(tempIsAdmin);
+  }, [person]);
 
   return (
     <PersonContext.Provider value={person}>
