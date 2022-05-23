@@ -23,8 +23,8 @@ export const useFirstSalesLoad = () => useContext(FirstSalesLoadContext);
 
 export function SalesProvider(a: { children: any }) {
   const isAdmin = useIsAdmin();
-  const [mayLoad, firstSalesLoad] = useMayLoad();
   const [sales, setSales] = useState<Sale[]>([]);
+  const [mayLoad, firstSalesLoad] = useMayLoad();
   const [loadingSales, setLoadingSales] = useState(true);
   const [reloaderState, setReloaderState] = useState(Date.now());
   const [from, setFrom] = useState(new Date(new Date().setHours(0, 0, 0, 0)));

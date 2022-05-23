@@ -5,7 +5,8 @@ export default function useMayLoad() {
 
   const allowLoading = useCallback(() => {
     if (!mayLoad) setMayLoad(true);
-  }, [setMayLoad, mayLoad]);
+    // eslint-disable-next-line
+  }, [setMayLoad]);
 
   return [mayLoad, allowLoading] as const;
 }

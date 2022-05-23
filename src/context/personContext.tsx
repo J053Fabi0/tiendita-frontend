@@ -142,6 +142,7 @@ export function PersonProvider(a: { children: any }) {
   useEffect(() => {
     const tempIsAdmin = person !== null && person.role === "admin";
     if (tempIsAdmin !== isAdmin) setIsAdmin(tempIsAdmin);
+    // eslint-disable-next-line
   }, [person]);
 
   return (

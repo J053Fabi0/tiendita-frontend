@@ -1,13 +1,16 @@
-import { useEffect, useState } from "react";
 import addCero from "../../utils/addCero";
+import { useEffect, useState } from "react";
 import { useIsAdmin } from "../../context/personContext";
+import useUpdateEffect from "../../hooks/useUpdateEffect";
 import { useParams, useNavigate } from "react-router-dom";
+import { useSalesState } from "../../context/salesContext";
 import { useProducts } from "../../context/productsContext";
 import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
 import { Breadcrumb, Col, Container, Row, Table } from "react-bootstrap";
-import { useFirstSalesLoad, useLoadingSales, useSalesState } from "../../context/salesContext";
 import { useFirstPersonsLoad, useLoadingPersons, usePersons } from "../../context/personsContext";
-import useUpdateEffect from "../../hooks/useUpdateEffect";
+import http from "../../http-common";
+import Sale from "../../types/sale.type";
+import useLoadData from "../../hooks/useLoadData";
 
 export default function SaleView() {
   const isAdmin = useIsAdmin();
@@ -23,13 +26,13 @@ export default function SaleView() {
 
   const navigate = useNavigate();
   const products = useProducts();
-  const loadingSales = useLoadingSales();
-  const loadingPersons = useLoadingPersons();
 
   const [sale, setSale] = useState(sales.find(({ id: thisID }) => thisID === saleID));
   useUpdateEffect(() => setSale(sales.find(({ id: thisID }) => thisID === saleID)), [sales]);
 
-  useRedirectIfTrue(!sale, "/ventas");
+  useLoadData([], setSale as any, () => http.get<{ message: Sale }>("/sale", { params: { id: saleID } }), {
+    conditionToStart: isAdmin && !sale && !isNaN(saleID),
+  });
 
   const [product, setProduct] = useState(
     sale ? products?.find(({ id: thisID }) => thisID === sale.product) : undefined
@@ -64,7 +67,7 @@ export default function SaleView() {
 
       <Row>
         <Col xs={12}>
-          {!sale ? (
+          {!sale || !product || !person ? (
             "Cargando..."
           ) : (
             <Table striped bordered size="sm">
@@ -75,11 +78,11 @@ export default function SaleView() {
                 </tr>
                 <tr>
                   <th>Persona</th>
-                  <td>{loadingPersons ? "Cargando..." : person?.name}</td>
+                  <td>{person.name}</td>
                 </tr>
                 <tr>
                   <th>Producto</th>
-                  <td>{!product ? "Cargando..." : product.name}</td>
+                  <td>{product.name}</td>
                 </tr>
                 <tr>
                   <th>Cantidad</th>
