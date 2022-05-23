@@ -1,10 +1,8 @@
-import http from "../../http-common";
 import addCero from "../../utils/addCero";
 import CustomToggle from "./CustomToggle";
 import DatePicker from "react-date-picker";
-import Person from "../../types/Person.type";
-import useLoadData from "../../hooks/useLoadData";
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
 import { useIsAdmin } from "../../context/personContext";
 import { useProducts } from "../../context/productsContext";
 import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
@@ -17,6 +15,7 @@ import {
   useLoadingSales,
   useFirstSalesLoad,
 } from "../../context/salesContext";
+import styled from "@emotion/styled";
 
 export default function Sales() {
   const isAdmin = useIsAdmin();
@@ -24,8 +23,10 @@ export default function Sales() {
 
   const firstSalesLoad = useFirstSalesLoad();
   const firstPersonsLoad = useFirstPersonsLoad();
-  useEffect(() => (firstSalesLoad(), firstPersonsLoad()), []);
+  // eslint-disable-next-line
+  useEffect(() => (firstSalesLoad(), firstPersonsLoad()), [firstSalesLoad, firstPersonsLoad]);
 
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("");
 
   const from = useFrom();
@@ -43,6 +44,8 @@ export default function Sales() {
     if (tab === null) return;
     setActiveTab(tab !== activeTab ? tab : "");
   };
+
+  const ClickableTableRow = styled.tr(`cursor: pointer;`);
 
   return !isAdmin ? null : (
     <Container>
@@ -85,7 +88,7 @@ export default function Sales() {
         ) : (
           <>
             <Col xs={12} className="overflow-auto">
-              <Table striped bordered hover={false} size="sm">
+              <Table striped bordered hover size="sm">
                 <thead>
                   <tr>
                     <th>Fecha</th>
@@ -107,7 +110,7 @@ export default function Sales() {
                       `${addCero(date.getHours())}:${addCero(date.getMinutes())}`;
 
                     return (
-                      <tr key={sale.id}>
+                      <ClickableTableRow key={sale.id} onClick={() => navigate("./" + sale.id)}>
                         <td>{dateString}</td>
                         <td>{loadingPersons ? "Cargando..." : getPersonByID(sale.person)?.name}</td>
                         <td>{!product ? "Cargando..." : product.name}</td>
@@ -120,14 +123,14 @@ export default function Sales() {
                               : `$${total - sale.cash} en efectivo`
                             : "No"}
                         </td>
-                      </tr>
+                      </ClickableTableRow>
                     );
                   })}
                 </tbody>
               </Table>
             </Col>
 
-            <Col xs={12} className="w-100 d-flex justify-content-end">
+            <Col xs={12} className="mb-3 w-100 d-flex justify-content-end">
               <b>Total:</b>&#8201;$
               {sales?.reduce(
                 (prev, sale) =>

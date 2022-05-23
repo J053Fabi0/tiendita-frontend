@@ -1,6 +1,7 @@
 import theme from "./styles/theme";
 import Home from "./views/Home/Home";
 import { Navbar } from "./components";
+import SaleView from "./views/Sales/Sale";
 import Sales from "./views/Sales/Sales";
 import Products from "./views/Products/Products";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
@@ -31,8 +32,9 @@ export default function App() {
 
                   <Routes>
                     <Route path="/" element={<Home />} />
-                    <Route path="/productos" element={<Products />} />
                     <Route path="/ventas" element={<Sales />} />
+                    <Route path="/ventas/:id" element={<SaleView />} />
+                    <Route path="/productos" element={<Products />} />
 
                     <Route path="*" element={<Home />} />
                   </Routes>

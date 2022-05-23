@@ -25,8 +25,8 @@ export function SalesProvider(a: { children: any }) {
   const isAdmin = useIsAdmin();
   const [mayLoad, firstSalesLoad] = useMayLoad();
   const [sales, setSales] = useState<Sale[]>([]);
+  const [loadingSales, setLoadingSales] = useState(true);
   const [reloaderState, setReloaderState] = useState(Date.now());
-  const [loadingSales, setLoadingSales] = useState(sales.length === 0);
   const [from, setFrom] = useState(new Date(new Date().setHours(0, 0, 0, 0)));
 
   const reloadSales = useCallback(() => {

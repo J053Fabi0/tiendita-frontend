@@ -3,7 +3,7 @@ import Person from "../types/Person.type";
 import useMayLoad from "../hooks/useMayLoad";
 import { useIsAdmin } from "./personContext";
 import useLoadData from "../hooks/useLoadData";
-import { useContext, createContext, useState, Dispatch, SetStateAction } from "react";
+import { useContext, createContext, useState } from "react";
 
 const LoadingPersonsContext = createContext(true);
 const PersonsContext = createContext<Person[]>([] as any);
