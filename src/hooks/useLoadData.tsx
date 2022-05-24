@@ -1,7 +1,6 @@
 import sleep from "../utils/sleep";
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { useAuthTokenReady } from "../context/personContext";
-import { AxiosError } from "axios";
 
 const notDefaultValue = {};
 

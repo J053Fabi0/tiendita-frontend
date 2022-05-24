@@ -1,5 +1,9 @@
+import axios from "axios";
+import http from "../../http-common";
+import Sale from "../../types/sale.type";
 import addCero from "../../utils/addCero";
 import { useEffect, useState } from "react";
+import useLoadData from "../../hooks/useLoadData";
 import { useIsAdmin } from "../../context/personContext";
 import useUpdateEffect from "../../hooks/useUpdateEffect";
 import { useParams, useNavigate } from "react-router-dom";
@@ -7,10 +11,7 @@ import { useSalesState } from "../../context/salesContext";
 import { useProducts } from "../../context/productsContext";
 import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
 import { Breadcrumb, Col, Container, Row, Table } from "react-bootstrap";
-import { useFirstPersonsLoad, useLoadingPersons, usePersons } from "../../context/personsContext";
-import http from "../../http-common";
-import Sale from "../../types/sale.type";
-import useLoadData from "../../hooks/useLoadData";
+import { useFirstPersonsLoad, usePersons } from "../../context/personsContext";
 
 export default function SaleView() {
   const isAdmin = useIsAdmin();
@@ -27,12 +28,24 @@ export default function SaleView() {
   const navigate = useNavigate();
   const products = useProducts();
 
+  const [saleError, setSaleError] = useState<boolean | string>(false);
   const [sale, setSale] = useState(sales.find(({ id: thisID }) => thisID === saleID));
   useUpdateEffect(() => setSale(sales.find(({ id: thisID }) => thisID === saleID)), [sales]);
 
-  useLoadData([], setSale as any, () => http.get<{ message: Sale }>("/sale", { params: { id: saleID } }), {
-    conditionToStart: isAdmin && !sale && !isNaN(saleID),
-  });
+  useLoadData(
+    [isAdmin, sale, setSale],
+    setSale as any,
+    () => http.get<{ message: Sale }>("/sale", { params: { id: saleID } }),
+    {
+      conditionToStart: isAdmin && !sale && !isNaN(saleID),
+      retryAfterError: false,
+
+      handleError: (e) => {
+        if (axios.isAxiosError(e)) console.log(e.response?.data.error);
+        setSaleError(true);
+      },
+    }
+  );
 
   const [product, setProduct] = useState(
     sale ? products?.find(({ id: thisID }) => thisID === sale.product) : undefined
@@ -67,7 +80,9 @@ export default function SaleView() {
 
       <Row>
         <Col xs={12}>
-          {!sale || !product || !person ? (
+          {!!saleError ? (
+            <p>Hubo un error obteniendo la información de esta venta. Es posible que no exista.</p>
+          ) : !sale || !product || !person ? (
             "Cargando..."
           ) : (
             <Table striped bordered size="sm">
