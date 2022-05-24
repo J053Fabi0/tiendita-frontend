@@ -1,6 +1,7 @@
 import sleep from "../utils/sleep";
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { useAuthTokenReady } from "../context/personContext";
+import { AxiosError } from "axios";
 
 const notDefaultValue = {};
 
@@ -49,7 +50,7 @@ export default function useLoadData<message>(
     retryAfterError = true,
     conditionToStart = true,
     loadingCB = () => void 0,
-    handleError = () => void 0,
+    handleError = false as any,
     defaultValue = notDefaultValue as any,
   }: Params<message> = {}
 ) {
@@ -68,8 +69,8 @@ export default function useLoadData<message>(
         try {
           message = (await httpMethod()).data.message;
         } catch (e) {
-          handleError(e);
-          console.error(e);
+          if (handleError) handleError(e);
+          else console.error(e);
           if (retryAfterError) await sleep(retryTime);
           else break;
         }
