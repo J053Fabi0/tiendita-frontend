@@ -12,6 +12,13 @@ interface Params<message> {
   retryTime?: number;
 
   /**
+   * @default true
+   */
+  retryAfterError?: boolean;
+
+  handleError?: (e: unknown) => any;
+
+  /**
    * The default value it will get every time the conditions are not met.
    */
   defaultValue?: SetStateAction<message>;
@@ -39,8 +46,10 @@ export default function useLoadData<message>(
   httpMethod: () => Promise<{ data: { message: message } }>,
   {
     retryTime = 1000,
+    retryAfterError = true,
     conditionToStart = true,
     loadingCB = () => void 0,
+    handleError = () => void 0,
     defaultValue = notDefaultValue as any,
   }: Params<message> = {}
 ) {
@@ -59,12 +68,14 @@ export default function useLoadData<message>(
         try {
           message = (await httpMethod()).data.message;
         } catch (e) {
+          handleError(e);
           console.error(e);
-          await sleep(retryTime);
+          if (retryAfterError) await sleep(retryTime);
+          else break;
         }
 
       loadingCB(false);
-      setter(message);
+      if (message !== null) setter(message);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authTokenReady, ...deps]);
