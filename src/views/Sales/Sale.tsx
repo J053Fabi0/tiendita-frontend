@@ -3,13 +3,14 @@ import http from "../../http-common";
 import Sale from "../../types/sale.type";
 import addCero from "../../utils/addCero";
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import useLoadData from "../../hooks/useLoadData";
 import { useIsAdmin } from "../../context/personContext";
 import useUpdateEffect from "../../hooks/useUpdateEffect";
-import { useParams, useNavigate } from "react-router-dom";
 import { useSalesState } from "../../context/salesContext";
 import { useProducts } from "../../context/productsContext";
 import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
+import useGoBackOrNavigate from "../../hooks/useGoBackOrNavigate";
 import { Breadcrumb, Col, Container, Row, Table } from "react-bootstrap";
 import { useFirstPersonsLoad, usePersons } from "../../context/personsContext";
 
@@ -25,7 +26,7 @@ export default function SaleView() {
   const persons = usePersons();
   const sales = useSalesState();
 
-  const navigate = useNavigate();
+  const goBackOrNavigate = useGoBackOrNavigate();
   const products = useProducts();
 
   const [saleError, setSaleError] = useState<boolean | string>(false);
@@ -74,7 +75,7 @@ export default function SaleView() {
   return (
     <Container>
       <Breadcrumb className="mt-3">
-        <Breadcrumb.Item onClick={() => navigate(-1)}>Ventas</Breadcrumb.Item>
+        <Breadcrumb.Item onClick={() => goBackOrNavigate(-1, "/ventas")}>Ventas</Breadcrumb.Item>
         <Breadcrumb.Item active>{saleID}</Breadcrumb.Item>
       </Breadcrumb>
 
