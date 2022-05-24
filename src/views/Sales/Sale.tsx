@@ -1,18 +1,16 @@
 import axios from "axios";
+import { useState } from "react";
 import http from "../../http-common";
 import Sale from "../../types/sale.type";
 import addCero from "../../utils/addCero";
-import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import useLoadData from "../../hooks/useLoadData";
 import { useIsAdmin } from "../../context/personContext";
 import useUpdateEffect from "../../hooks/useUpdateEffect";
 import { useSalesState } from "../../context/salesContext";
-import { useProducts } from "../../context/productsContext";
 import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
 import useGoBackOrNavigate from "../../hooks/useGoBackOrNavigate";
 import { Breadcrumb, Col, Container, Row, Spinner, Table } from "react-bootstrap";
-import { useFirstPersonsLoad, usePersons } from "../../context/personsContext";
 
 export default function SaleView() {
   const isAdmin = useIsAdmin();
@@ -20,14 +18,9 @@ export default function SaleView() {
 
   useRedirectIfTrue(isNaN(saleID) || !isAdmin, "/ventas");
 
-  const firstPersonsLoad = useFirstPersonsLoad();
-  useEffect(firstPersonsLoad, [firstPersonsLoad]);
-
-  const persons = usePersons();
   const sales = useSalesState();
 
   const goBackOrNavigate = useGoBackOrNavigate();
-  const products = useProducts();
 
   const [saleError, setSaleError] = useState<boolean | string>(false);
   const [sale, setSale] = useState(sales.find(({ id: thisID }) => thisID === saleID));
@@ -48,16 +41,8 @@ export default function SaleView() {
     }
   );
 
-  const [product, setProduct] = useState(
-    sale ? products?.find(({ id: thisID }) => thisID === sale.product) : undefined
-  );
-  useUpdateEffect(
-    () => setProduct(sale ? products?.find(({ id: thisID }) => thisID === sale.product) : undefined),
-    [products, sale]
-  );
-
-  const [person, setPerson] = useState(persons.find(({ id: thisID }) => thisID === sale?.person));
-  useUpdateEffect(() => setPerson(persons.find(({ id: thisID }) => thisID === sale?.person)), [persons, sale]);
+  const product = sale?.product;
+  const person = sale?.person;
 
   const [date, setDate] = useState(new Date(sale?.date ?? 0));
   useUpdateEffect(() => setDate(new Date(sale?.date ?? 0)), [sale]);

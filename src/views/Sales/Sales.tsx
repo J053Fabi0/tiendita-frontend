@@ -1,13 +1,11 @@
 import addCero from "../../utils/addCero";
 import CustomToggle from "./CustomToggle";
 import DatePicker from "react-date-picker";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useCallback, useEffect, useState } from "react";
 import { useIsAdmin } from "../../context/personContext";
-import { useProducts } from "../../context/productsContext";
 import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
 import { Accordion, Card, Col, Container, Nav, Row, Spinner, Table } from "react-bootstrap";
-import { useFirstPersonsLoad, useLoadingPersons, usePersons } from "../../context/personsContext";
 import {
   useFrom,
   useFromUpdate,
@@ -22,23 +20,15 @@ export default function Sales() {
   useRedirectIfTrue(!isAdmin);
 
   const firstSalesLoad = useFirstSalesLoad();
-  const firstPersonsLoad = useFirstPersonsLoad();
-  // eslint-disable-next-line
-  useEffect(() => (firstSalesLoad(), firstPersonsLoad()), [firstSalesLoad, firstPersonsLoad]);
+  useEffect(firstSalesLoad, [firstSalesLoad]);
 
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("");
 
   const from = useFrom();
-  const persons = usePersons();
   const sales = useSalesState();
   const setFrom = useFromUpdate();
   const loadingSales = useLoadingSales();
-  const loadingPersons = useLoadingPersons();
-
-  const products = useProducts();
-  const getPersonByID = useCallback((id) => persons?.find(({ id: thisID }) => thisID === id), [persons]);
-  const getProductByID = useCallback((id) => products?.find(({ id: thisID }) => thisID === id), [products]);
 
   const handleTabSelect = (tab: string | null) => {
     if (tab === null) return;
@@ -102,7 +92,7 @@ export default function Sales() {
                 <tbody>
                   {sales.map((sale) => {
                     const date = new Date(sale.date);
-                    const product = getProductByID(sale.product);
+                    const product = sale.product;
                     const total = sale.specialPrice ?? sale.quantity * (product?.price ?? 0);
                     const dateString =
                       `${addCero(date.getDate())}/${addCero(date.getMonth())}/` +
@@ -112,7 +102,7 @@ export default function Sales() {
                     return (
                       <ClickableTableRow key={sale.id} onClick={() => navigate("./" + sale.id)}>
                         <td>{dateString}</td>
-                        <td>{loadingPersons ? "Cargando..." : getPersonByID(sale.person)?.name}</td>
+                        <td>{sale.person.name}</td>
                         <td>{!product ? "Cargando..." : product.name}</td>
                         <td>{sale.quantity}</td>
                         <td>${!product && !sale.specialPrice ? "Cargando..." : total}</td>
@@ -133,8 +123,7 @@ export default function Sales() {
             <Col xs={12} className="mb-3 w-100 d-flex justify-content-end">
               <b>Total:</b>&#8201;$
               {sales?.reduce(
-                (prev, sale) =>
-                  prev + (sale.specialPrice ?? sale.quantity * (getProductByID(sale.product)?.price ?? 0)),
+                (prev, sale) => prev + (sale.specialPrice ?? sale.quantity * (sale.product.price ?? 0)),
                 0
               )}
             </Col>
