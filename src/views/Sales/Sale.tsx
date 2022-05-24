@@ -11,7 +11,7 @@ import { useSalesState } from "../../context/salesContext";
 import { useProducts } from "../../context/productsContext";
 import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
 import useGoBackOrNavigate from "../../hooks/useGoBackOrNavigate";
-import { Breadcrumb, Col, Container, Row, Table } from "react-bootstrap";
+import { Breadcrumb, Col, Container, Row, Spinner, Table } from "react-bootstrap";
 import { useFirstPersonsLoad, usePersons } from "../../context/personsContext";
 
 export default function SaleView() {
@@ -76,15 +76,19 @@ export default function SaleView() {
     <Container>
       <Breadcrumb className="mt-3">
         <Breadcrumb.Item onClick={() => goBackOrNavigate(-1, "/ventas")}>Ventas</Breadcrumb.Item>
-        <Breadcrumb.Item active>{saleID}</Breadcrumb.Item>
+        <Breadcrumb.Item active>Venta #{saleID}</Breadcrumb.Item>
       </Breadcrumb>
 
       <Row>
         <Col xs={12}>
           {!!saleError ? (
-            <p>Hubo un error obteniendo la información de esta venta. Es posible que no exista.</p>
+            <h5 className="w-100 text-center">
+              Hubo un error obteniendo la información de esta venta. Es posible que no exista.
+            </h5>
           ) : !sale || !product || !person ? (
-            "Cargando..."
+            <div className="w-100 d-flex justify-content-center align-items-center">
+              <Spinner animation="border" size="sm" /> &#8194;Cargando...
+            </div>
           ) : (
             <Table striped bordered size="sm">
               <tbody>
