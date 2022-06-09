@@ -1,9 +1,9 @@
 import http from "../http-common";
 import Sale from "../types/sale.type";
 import { useIsAdmin } from "./personContext";
+import useMayLoad from "../hooks/useMayLoad";
 import useLoadData from "../hooks/useLoadData";
 import { useContext, createContext, useState, Dispatch, SetStateAction, useCallback } from "react";
-import useMayLoad from "../hooks/useMayLoad";
 
 const SalesReloaderContext = createContext(0);
 const SalesContext = createContext<Sale[]>([]);

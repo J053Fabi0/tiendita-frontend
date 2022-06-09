@@ -22,7 +22,7 @@ export default function App() {
               <BrowserRouter>
                 <Navbar
                   links={[
-                    { path: "/", title: "Ventas" },
+                    { path: "/", title: "Vender" },
                     { path: "/productos", title: "Productos", onlyAdmins: true },
                     { path: "/ventas", title: "Ventas", onlyAdmins: true },
                   ]}
@@ -31,8 +31,8 @@ export default function App() {
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/ventas" element={<Sales />} />
-                  <Route path="/ventas/:id" element={<SaleView />} />
                   <Route path="/productos" element={<Products />} />
+                  <Route path="/ventas/:id" element={<SaleView />} />
 
                   <Route path="*" element={<Home />} />
                 </Routes>

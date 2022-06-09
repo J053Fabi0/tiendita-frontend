@@ -30,7 +30,15 @@ export function ProductsProvider(a: { children: any }) {
         await sleep(1000);
       }
 
-    setProducts(products);
+    setProducts(
+      products.sort(({ name: a_name }, { name: b_name }) => {
+        a_name = a_name.toLowerCase();
+        b_name = b_name.toLowerCase();
+        if (a_name < b_name) return -1;
+        if (a_name > b_name) return 1;
+        else return 0;
+      })
+    );
   }, [authTokenReady]);
 
   useEffect(() => void reloadProducts(), [reloadProducts]);

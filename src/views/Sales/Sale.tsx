@@ -1,16 +1,17 @@
 import axios from "axios";
-import { useState } from "react";
 import http from "../../http-common";
 import Sale from "../../types/sale.type";
 import addCero from "../../utils/addCero";
 import { useParams } from "react-router-dom";
+import { useCallback, useState } from "react";
 import useLoadData from "../../hooks/useLoadData";
+import useReactModal from "../../hooks/useReactModal";
 import { useIsAdmin } from "../../context/personContext";
 import useUpdateEffect from "../../hooks/useUpdateEffect";
-import { useSalesState } from "../../context/salesContext";
 import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
 import useGoBackOrNavigate from "../../hooks/useGoBackOrNavigate";
-import { Breadcrumb, Col, Container, Row, Spinner, Table } from "react-bootstrap";
+import { useSalesState, useReloadSales } from "../../context/salesContext";
+import { Breadcrumb, Button, Col, Container, Row, Spinner, Table } from "react-bootstrap";
 
 export default function SaleView() {
   const isAdmin = useIsAdmin();
@@ -19,12 +20,12 @@ export default function SaleView() {
   useRedirectIfTrue(isNaN(saleID) || !isAdmin, "/ventas");
 
   const sales = useSalesState();
+  const reloadSales = useReloadSales();
 
   const goBackOrNavigate = useGoBackOrNavigate();
 
   const [saleError, setSaleError] = useState<boolean | string>(false);
   const [sale, setSale] = useState(sales.find(({ id: thisID }) => thisID === saleID));
-  useUpdateEffect(() => setSale(sales.find(({ id: thisID }) => thisID === saleID)), [sales]);
 
   useLoadData(
     [isAdmin, sale, setSale],
@@ -52,10 +53,44 @@ export default function SaleView() {
     `${date.getFullYear().toString().substring(2)} ` +
     `${addCero(date.getHours())}:${addCero(date.getMinutes())}`;
 
-  const [dateString, setDateString] = useState(getDateString(date));
+  const [dateString, setDateString] = useState(+date === 0 ? "" : getDateString(date));
   useUpdateEffect(() => setDateString(getDateString(date)), [date]);
 
   const total = sale ? sale.specialPrice ?? sale.quantity * (product?.price ?? 0) : 0;
+
+  const [deleting, setDeleting] = useState(false);
+  const handleDelete = useCallback(async () => {
+    try {
+      setDeleting(true);
+      await http.delete("/sale", { data: { id: saleID } });
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setDeleting(false);
+      reloadSales();
+      setDeleteModalShow(false);
+      goBackOrNavigate(-1, "/");
+    }
+    // eslint-disable-next-line
+  }, [saleID, setDeleting, reloadSales, goBackOrNavigate]);
+
+  const { Modal: DeleteModal, setShow: setDeleteModalShow } = useReactModal(
+    "¿Estás seguro de querer borrar la venta?",
+
+    <div className="d-flex justify-content-end">
+      <Button variant="danger" onClick={handleDelete} disabled={deleting}>
+        {deleting ? <Spinner animation="border" size="sm" /> : "Borrar"}
+      </Button>
+      {deleting ? null : (
+        <Button variant="secondary" onClick={() => setDeleteModalShow(false)} className="ms-2" disabled={deleting}>
+          Cancelar
+        </Button>
+      )}
+    </div>,
+    null,
+
+    { verticallyCentered: true }
+  );
 
   return (
     <Container>
@@ -64,17 +99,17 @@ export default function SaleView() {
         <Breadcrumb.Item active>Venta #{saleID}</Breadcrumb.Item>
       </Breadcrumb>
 
-      <Row>
-        <Col xs={12}>
-          {!!saleError ? (
-            <h5 className="w-100 text-center">
-              Hubo un error obteniendo la información de esta venta. Es posible que no exista.
-            </h5>
-          ) : !sale || !product || !person ? (
-            <div className="w-100 d-flex justify-content-center align-items-center">
-              <Spinner animation="border" size="sm" /> &#8194;Cargando...
-            </div>
-          ) : (
+      {!!saleError ? (
+        <h5 className="w-100 text-center">
+          Hubo un error obteniendo la información de esta venta. Es posible que no exista.
+        </h5>
+      ) : !sale || !product || !person || !dateString ? (
+        <div className="w-100 d-flex justify-content-center align-items-center">
+          <Spinner animation="border" size="sm" /> &#8194;Cargando...
+        </div>
+      ) : (
+        <Row>
+          <Col xs={12}>
             <Table striped bordered size="sm">
               <tbody>
                 <tr>
@@ -105,9 +140,17 @@ export default function SaleView() {
                 </tr>
               </tbody>
             </Table>
-          )}
-        </Col>
-      </Row>
+          </Col>
+
+          <Col>
+            <Button variant="danger" onClick={() => setDeleteModalShow(true)}>
+              Eliminar
+            </Button>
+          </Col>
+        </Row>
+      )}
+
+      {DeleteModal}
     </Container>
   );
 }
