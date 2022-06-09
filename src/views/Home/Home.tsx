@@ -1,15 +1,15 @@
 import http from "../../http-common";
-import Filters from "./Filters/Filters";
 import Values from "../../types/values.type";
 import Card from "../../components/Card/Card";
-import { Fragment, useCallback } from "react";
+import SearchBar from "./SearchBar/SearchBar";
 import Product from "../../types/product.type";
 import { Row, Col, Container } from "react-bootstrap";
 import { usePerson } from "../../context/personContext";
 import useProductModal from "../../hooks/useProductModal";
+import { useReloadSales } from "../../context/salesContext";
+import { Fragment, useCallback, useState, useMemo } from "react";
 import useNewSaleModal from "../../hooks/useNewSaleModal/useNewSaleModal";
 import { useProducts, useReloadProduct } from "../../context/productsContext";
-import { useReloadSales } from "../../context/salesContext";
 
 export default function Home() {
   const person = usePerson();
@@ -64,14 +64,35 @@ export default function Home() {
     [setProduct, setShow, show]
   );
 
-  const cards = products?.map((product) => (
-    <Card key={product.id} product={product} handleOnClick={handleOnClick} />
-  ));
+  const [searchQuery, setSearchQuery] = useState("");
+  const cards = useMemo(
+    () =>
+      products
+        ?.filter((product) => {
+          const queries = searchQuery.split(" ");
+
+          for (const query of queries) {
+            const regex = new RegExp(query, "ig");
+            const price = new RegExp(`^${query}$`);
+
+            if (
+              regex.test(product.name) || // The name
+              (product.description ? regex.test(product.description) : false) || // The description
+              price.test(product.price.toString()) // The price
+            )
+              return true;
+          }
+          return false;
+        })
+        .map((product) => <Card key={product.id} product={product} handleOnClick={handleOnClick} />),
+    [searchQuery]
+  );
 
   return person === null ? null : (
     <Fragment>
       <Container className="mt-3">
         <Row>
+          <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
           {/* <Filters /> */}
           <Col>
             <Row>{products === null ? loadingCards : cards}</Row>
