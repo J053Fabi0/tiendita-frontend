@@ -27,7 +27,7 @@ export function PersonProvider(a: { children: any }) {
   const [authTokenReady, setAuthTokenReady] = useState<boolean>(false);
   const [person, setPerson] = useLocalStorage<Person | null>("person", null);
   const [isAdmin, setIsAdmin] = useState(person !== null && person.role === "admin");
-  const [authToken, setAuthToken] = useCookie("authtoken", "", { secure: true, expires: 365 });
+  const [authToken, setAuthToken] = useCookie("authtoken", "", { secure: true, expires: 30 });
 
   useEffect(() => {
     if (authToken) {

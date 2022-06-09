@@ -70,6 +70,7 @@ export default function Home() {
       products
         ?.filter((product) => {
           const queries = searchQuery.split(" ");
+          if (queries.length === 0) return true;
 
           for (const query of queries) {
             const regex = new RegExp(query, "ig");
@@ -85,7 +86,7 @@ export default function Home() {
           return false;
         })
         .map((product) => <Card key={product.id} product={product} handleOnClick={handleOnClick} />),
-    [searchQuery]
+    [searchQuery, products]
   );
 
   return person === null ? null : (
