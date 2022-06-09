@@ -1,16 +1,16 @@
 import axios from "axios";
-import http from "../../http-common";
-import Sale from "../../types/sale.type";
-import addCero from "../../utils/addCero";
+import http from "../../../http-common";
+import Sale from "../../../types/sale.type";
+import addCero from "../../../utils/addCero";
 import { useParams } from "react-router-dom";
 import { useCallback, useState } from "react";
-import useLoadData from "../../hooks/useLoadData";
-import useReactModal from "../../hooks/useReactModal";
-import { useIsAdmin } from "../../context/personContext";
-import useUpdateEffect from "../../hooks/useUpdateEffect";
-import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
-import useGoBackOrNavigate from "../../hooks/useGoBackOrNavigate";
-import { useSalesState, useReloadSales } from "../../context/salesContext";
+import useLoadData from "../../../hooks/useLoadData";
+import useReactModal from "../../../hooks/useReactModal";
+import { useIsAdmin } from "../../../context/personContext";
+import useUpdateEffect from "../../../hooks/useUpdateEffect";
+import useRedirectIfTrue from "../../../hooks/useRedirectIfTrue";
+import useGoBackOrNavigate from "../../../hooks/useGoBackOrNavigate";
+import { useSalesState, useReloadSales } from "../../../context/salesContext";
 import { Breadcrumb, Button, Col, Container, Row, Spinner, Table } from "react-bootstrap";
 
 export default function SaleView() {

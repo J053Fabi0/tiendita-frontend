@@ -1,7 +1,7 @@
 import theme from "./styles/theme";
 import Home from "./views/Home/Home";
 import { Navbar } from "./components";
-import SaleView from "./views/Sales/Sale";
+import SaleView from "./views/Sales/Sale/Sale";
 import Sales from "./views/Sales/Sales";
 import Products from "./views/Products/Products";
 import { Routes, Route, BrowserRouter } from "react-router-dom";

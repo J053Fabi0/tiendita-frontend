@@ -1,12 +1,4 @@
-import styled from "@emotion/styled";
-import addCero from "../../utils/addCero";
-import CustomToggle from "./CustomToggle";
-import DatePicker from "react-date-picker";
-import { useNavigate } from "react-router-dom";
-import { useIsAdmin } from "../../context/personContext";
-import { useEffect, useState } from "react";
-import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
-import { Accordion, Card, Col, Container, Form, Nav, Row, Spinner, Table } from "react-bootstrap";
+import Caret from "./Sale/Caret";
 import {
   useFrom,
   useFromUpdate,
@@ -14,7 +6,19 @@ import {
   useLoadingSales,
   useFirstSalesLoad,
 } from "../../context/salesContext";
+import styled from "@emotion/styled";
+import addCero from "../../utils/addCero";
+import CustomToggle from "./CustomToggle";
+import DatePicker from "react-date-picker";
 import useArray from "../../hooks/useArray";
+import { useNavigate } from "react-router-dom";
+import SortOption from "./Sale/sortOption.type";
+import SortMethod from "./Sale/sortMethod.type";
+import { useIsAdmin } from "../../context/personContext";
+import { useEffect, useLayoutEffect, useState } from "react";
+import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
+import { Accordion, Card, Col, Container, Form, Nav, Row, Spinner, Table } from "react-bootstrap";
+import useSalesSorted from "./Sale/useSalesSorted";
 
 export default function Sales() {
   const isAdmin = useIsAdmin();
@@ -30,6 +34,8 @@ export default function Sales() {
   const sales = useSalesState();
   const setFrom = useFromUpdate();
   const loadingSales = useLoadingSales();
+  const [salesSorted, setSalesSorted] = useState(sales);
+  const [sortOption, setSortOption] = useState<SortOption>("date-up");
   const [salesSelected, { remove, push, clear }] = useArray<number>();
 
   const handleTabSelect = (tab: string | null) => {
@@ -37,8 +43,18 @@ export default function Sales() {
     setActiveTab(tab !== activeTab ? tab : "");
   };
 
+  useSalesSorted(sales, setSalesSorted, sortOption);
+
+  const handleSortOption = (method: SortMethod) => {
+    const [actualMethod, direction] = sortOption.split("-") as [SortMethod, "up" | "down"];
+
+    if (actualMethod === method)
+      setSortOption((method + "-" + (direction === "up" ? "down" : "up")) as SortOption);
+    else setSortOption((method + "-up") as SortOption);
+  };
+
   const TD = styled.td(`cursor: pointer;`);
-  const TH = styled.th(`cursor: pointer;`);
+  const TH = styled.th(`cursor: pointer; :hover { text-decoration: underline; }`);
   const FormCheck = styled(Form.Check)(`cursor: pointer;`);
 
   return !isAdmin ? null : (
@@ -85,12 +101,24 @@ export default function Sales() {
               <Table striped bordered hover size="sm">
                 <thead>
                   <tr>
-                    <th>Fecha</th>
-                    <th>Persona</th>
-                    <th>Producto</th>
-                    <th>Cantidad</th>
-                    <th>Total</th>
-                    <th>💳</th>
+                    <TH onClick={() => handleSortOption("date")}>
+                      Fecha <Caret sortOption={sortOption} sortMethod="date" />
+                    </TH>
+                    <TH onClick={() => handleSortOption("person")}>
+                      Persona <Caret sortOption={sortOption} sortMethod="person" />
+                    </TH>
+                    <TH onClick={() => handleSortOption("product")}>
+                      Producto <Caret sortOption={sortOption} sortMethod="product" />
+                    </TH>
+                    <TH onClick={() => handleSortOption("quantity")}>
+                      Cantidad <Caret sortOption={sortOption} sortMethod="quantity" />
+                    </TH>
+                    <TH onClick={() => handleSortOption("total")}>
+                      Total <Caret sortOption={sortOption} sortMethod="total" />
+                    </TH>
+                    <TH onClick={() => handleSortOption("creditcard")}>
+                      💳 <Caret sortOption={sortOption} sortMethod="creditcard" />
+                    </TH>
                     <TH onClick={() => (salesSelected.length > 0 ? clear() : push(...sales.map(({ id }) => id)))}>
                       <FormCheck
                         readOnly
@@ -102,7 +130,7 @@ export default function Sales() {
                   </tr>
                 </thead>
                 <tbody>
-                  {sales.map((sale) => {
+                  {salesSorted.map((sale) => {
                     const date = new Date(sale.date);
                     const product = sale.product;
                     const total = sale.specialPrice ?? sale.quantity * (product?.price ?? 0);
