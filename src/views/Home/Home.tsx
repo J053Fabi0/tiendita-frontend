@@ -3,14 +3,14 @@ import Values from "../../types/values.type";
 import Card from "../../components/Card/Card";
 import SearchBar from "./SearchBar/SearchBar";
 import Product from "../../types/product.type";
+import useCardsFiltered from "./useCardsFiltered";
 import { Row, Col, Container } from "react-bootstrap";
 import { usePerson } from "../../context/personContext";
+import { Fragment, useCallback, useState } from "react";
 import useProductModal from "../../hooks/useProductModal";
 import { useReloadSales } from "../../context/salesContext";
-import { Fragment, useCallback, useState, useMemo } from "react";
 import useNewSaleModal from "../../hooks/useNewSaleModal/useNewSaleModal";
 import { useProducts, useReloadProduct } from "../../context/productsContext";
-import normalize from "../../utils/normalize";
 
 export default function Home() {
   const person = usePerson();
@@ -66,29 +66,7 @@ export default function Home() {
   );
 
   const [searchQuery, setSearchQuery] = useState("");
-  const cards = useMemo(
-    () =>
-      products
-        ?.filter((product) => {
-          const queries = searchQuery.split(" ");
-          if (queries.length === 0) return true;
-
-          for (const query of queries) {
-            const regex = new RegExp(query, "ig");
-            const price = new RegExp(`^${query}$`);
-
-            if (
-              regex.test(normalize(product.name)) || // The name
-              (product.description ? regex.test(normalize(product.description)) : false) || // The description
-              price.test(product.price.toString()) // The price
-            )
-              return true;
-          }
-          return false;
-        })
-        .map((product) => <Card key={product.id} product={product} handleOnClick={handleOnClick} />),
-    [searchQuery, products, handleOnClick]
-  );
+  const cards = useCardsFiltered(searchQuery, products, handleOnClick);
 
   return person === null ? null : (
     <Fragment>
