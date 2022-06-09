@@ -10,7 +10,7 @@ interface Props {
 export default function SearchBar({ setSearchQuery, delay = 200 }: Props) {
   const [tempSearchQuery, setTempSearchQuery] = useState("");
 
-  const search = useCallback(() => void setSearchQuery(tempSearchQuery), [tempSearchQuery]);
+  const search = useCallback(() => void setSearchQuery(tempSearchQuery), [tempSearchQuery, setSearchQuery]);
 
   useDebounce(search, delay, [search]);
 

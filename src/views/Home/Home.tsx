@@ -86,7 +86,7 @@ export default function Home() {
           return false;
         })
         .map((product) => <Card key={product.id} product={product} handleOnClick={handleOnClick} />),
-    [searchQuery, products]
+    [searchQuery, products, handleOnClick]
   );
 
   return person === null ? null : (

@@ -1,11 +1,12 @@
+import styled from "@emotion/styled";
 import addCero from "../../utils/addCero";
 import CustomToggle from "./CustomToggle";
 import DatePicker from "react-date-picker";
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useIsAdmin } from "../../context/personContext";
+import { useEffect, useState } from "react";
 import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
-import { Accordion, Card, Col, Container, Nav, Row, Spinner, Table } from "react-bootstrap";
+import { Accordion, Card, Col, Container, Form, Nav, Row, Spinner, Table } from "react-bootstrap";
 import {
   useFrom,
   useFromUpdate,
@@ -13,7 +14,7 @@ import {
   useLoadingSales,
   useFirstSalesLoad,
 } from "../../context/salesContext";
-import styled from "@emotion/styled";
+import useArray from "../../hooks/useArray";
 
 export default function Sales() {
   const isAdmin = useIsAdmin();
@@ -29,13 +30,16 @@ export default function Sales() {
   const sales = useSalesState();
   const setFrom = useFromUpdate();
   const loadingSales = useLoadingSales();
+  const [salesSelected, { remove, push, clear }] = useArray<number>();
 
   const handleTabSelect = (tab: string | null) => {
     if (tab === null) return;
     setActiveTab(tab !== activeTab ? tab : "");
   };
 
-  const ClickableTableRow = styled.tr(`cursor: pointer;`);
+  const TD = styled.td(`cursor: pointer;`);
+  const TH = styled.th(`cursor: pointer;`);
+  const FormCheck = styled(Form.Check)(`cursor: pointer;`);
 
   return !isAdmin ? null : (
     <Container>
@@ -44,7 +48,7 @@ export default function Sales() {
           <Accordion className="w-100 d-flex align-items-center flex-column">
             <Nav variant="pills" activeKey={activeTab} defaultActiveKey="days" onSelect={handleTabSelect}>
               <CustomToggle eventKey="days">Día</CustomToggle>
-              <CustomToggle eventKey="persons">Personas</CustomToggle>
+              {/* <CustomToggle eventKey="persons">Personas</CustomToggle> */}
             </Nav>
 
             <Accordion.Collapse eventKey="days">
@@ -86,7 +90,15 @@ export default function Sales() {
                     <th>Producto</th>
                     <th>Cantidad</th>
                     <th>Total</th>
-                    <th>Tarjeta</th>
+                    <th>💳</th>
+                    <TH onClick={() => (salesSelected.length > 0 ? clear() : push(...sales.map(({ id }) => id)))}>
+                      <FormCheck
+                        readOnly
+                        type="checkbox"
+                        checked={salesSelected.length > 0}
+                        className="d-flex justify-content-center"
+                      />
+                    </TH>
                   </tr>
                 </thead>
                 <tbody>
@@ -99,34 +111,75 @@ export default function Sales() {
                       `${date.getFullYear().toString().substring(2)} ` +
                       `${addCero(date.getHours())}:${addCero(date.getMinutes())}`;
 
+                    const handleClick = () => navigate("./" + sale.id);
+
+                    const handleCheck = () => {
+                      const index = salesSelected.indexOf(sale.id);
+                      if (index !== -1) remove(index);
+                      else push(sale.id);
+                    };
+
                     return (
-                      <ClickableTableRow key={sale.id} onClick={() => navigate("./" + sale.id)}>
-                        <td>{dateString}</td>
-                        <td>{sale.person.name}</td>
-                        <td>{!product ? "Cargando..." : product.name}</td>
-                        <td>{sale.quantity}</td>
-                        <td>${!product && !sale.specialPrice ? "Cargando..." : total}</td>
-                        <td>
+                      <tr key={sale.id}>
+                        <TD onClick={handleClick}>{dateString}</TD>
+                        <TD onClick={handleClick}>{sale.person.name}</TD>
+                        <TD onClick={handleClick}>{!product ? "Cargando..." : product.name}</TD>
+                        <TD onClick={handleClick}>{sale.quantity}</TD>
+                        <TD onClick={handleClick}>${!product && !sale.specialPrice ? "Cargando..." : total}</TD>
+                        <TD onClick={handleClick}>
                           {sale.cash !== total
                             ? sale.cash === 0
                               ? "Todo"
                               : `$${total - sale.cash} en efectivo`
                             : "No"}
-                        </td>
-                      </ClickableTableRow>
+                        </TD>
+                        <TD onClick={handleCheck}>
+                          <FormCheck
+                            type="checkbox"
+                            readOnly={true}
+                            className="d-flex justify-content-center"
+                            checked={salesSelected.includes(sale.id)}
+                          />
+                        </TD>
+                      </tr>
                     );
                   })}
                 </tbody>
               </Table>
             </Col>
 
-            <Col xs={12} className="mb-3 w-100 d-flex justify-content-end">
+            {salesSelected.length === 0 ? null : (
+              <>
+                <Col xs={12} className="w-100 d-flex justify-content-end">
+                  <b>Total seleccionado:</b>&#8201;$
+                  {sales
+                    ?.filter(({ id }) => salesSelected.includes(id))
+                    .reduce(
+                      (prev, sale) => prev + (sale.specialPrice ?? sale.quantity * (sale.product.price ?? 0)),
+                      0
+                    )}
+                </Col>
+                <Col xs={12} className="w-100 d-flex justify-content-end">
+                  <b>Resto:</b>&#8201;$
+                  {sales
+                    ?.filter(({ id }) => !salesSelected.includes(id))
+                    .reduce(
+                      (prev, sale) => prev + (sale.specialPrice ?? sale.quantity * (sale.product.price ?? 0)),
+                      0
+                    )}
+                </Col>
+              </>
+            )}
+
+            <Col xs={12} className="w-100 d-flex justify-content-end">
               <b>Total:</b>&#8201;$
               {sales?.reduce(
                 (prev, sale) => prev + (sale.specialPrice ?? sale.quantity * (sale.product.price ?? 0)),
                 0
               )}
             </Col>
+
+            <div className="mt-3" />
           </>
         )}
       </Row>
