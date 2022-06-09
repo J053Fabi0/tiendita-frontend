@@ -72,7 +72,7 @@ export default function Home() {
     <Fragment>
       <Container className="mt-3">
         <Row>
-          <Filters />
+          {/* <Filters /> */}
           <Col>
             <Row>{products === null ? loadingCards : cards}</Row>
           </Col>
