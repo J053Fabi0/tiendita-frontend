@@ -11,14 +11,14 @@ import addCero from "../../utils/addCero";
 import CustomToggle from "./CustomToggle";
 import DatePicker from "react-date-picker";
 import useArray from "../../hooks/useArray";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SortOption from "./Sale/sortOption.type";
 import SortMethod from "./Sale/sortMethod.type";
+import useSalesSorted from "./Sale/useSalesSorted";
 import { useIsAdmin } from "../../context/personContext";
-import { useEffect, useLayoutEffect, useState } from "react";
 import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
 import { Accordion, Card, Col, Container, Form, Nav, Row, Spinner, Table } from "react-bootstrap";
-import useSalesSorted from "./Sale/useSalesSorted";
 
 export default function Sales() {
   const isAdmin = useIsAdmin();

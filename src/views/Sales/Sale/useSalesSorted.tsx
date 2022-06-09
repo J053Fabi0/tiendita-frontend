@@ -1,6 +1,7 @@
 import SortMethod from "./sortMethod.type";
 import SortOption from "./sortOption.type";
 import Sale from "../../../types/sale.type";
+import normalize from "../../../utils/normalize";
 import { Dispatch, SetStateAction, useLayoutEffect } from "react";
 
 export default function useSalesSorted(
@@ -33,14 +34,8 @@ export default function useSalesSorted(
 
           case "person":
           case "product": {
-            const a = sale1[actualMethod].name
-              .normalize("NFD")
-              .replace(/\p{Diacritic}/gu, "")
-              .toLowerCase();
-            const b = sale2[actualMethod].name
-              .normalize("NFD")
-              .replace(/\p{Diacritic}/gu, "")
-              .toLowerCase();
+            const a = normalize(sale1[actualMethod].name).toLowerCase();
+            const b = normalize(sale2[actualMethod].name).toLowerCase();
             return (a < b ? -1 : a > b ? 1 : 0) * (direction === "down" ? -1 : 1);
           }
 
@@ -49,5 +44,5 @@ export default function useSalesSorted(
         }
       })
     );
-  }, [sales, sortOption]);
+  }, [sales, sortOption, setSalesSorted]);
 }

@@ -10,6 +10,7 @@ import { useReloadSales } from "../../context/salesContext";
 import { Fragment, useCallback, useState, useMemo } from "react";
 import useNewSaleModal from "../../hooks/useNewSaleModal/useNewSaleModal";
 import { useProducts, useReloadProduct } from "../../context/productsContext";
+import normalize from "../../utils/normalize";
 
 export default function Home() {
   const person = usePerson();
@@ -77,8 +78,8 @@ export default function Home() {
             const price = new RegExp(`^${query}$`);
 
             if (
-              regex.test(product.name) || // The name
-              (product.description ? regex.test(product.description) : false) || // The description
+              regex.test(normalize(product.name)) || // The name
+              (product.description ? regex.test(normalize(product.description)) : false) || // The description
               price.test(product.price.toString()) // The price
             )
               return true;
