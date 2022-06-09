@@ -150,8 +150,23 @@ export default function useNewSaleModal(
               <FormikForm onSubmit={handleSubmit}>
                 <Modal.Body>
                   <Row>
-                    {state.product!.description ? <p>{state.product!.description}</p> : null}
+                    <p>
+                      Total:{" "}
+                      <code>
+                        $
+                        {(() => {
+                          let total = 0;
+                          if (values.specialPriceExists)
+                            total = values.specialPriceTotal
+                              ? values.specialPrice
+                              : values.specialPrice * values.quantity;
+                          else total = values.quantity * state.product!.price;
+                          return total;
+                        })()}
+                      </code>
+                    </p>
 
+                    {state.product!.description ? <p>{state.product!.description}</p> : null}
                     {/* Quantity */}
                     <Form.Group as={Col} xs={12} controlId="formCantidad">
                       <Form.Label>Cantidad</Form.Label>
@@ -170,7 +185,6 @@ export default function useNewSaleModal(
                         <Form.Control.Feedback type="invalid">{errors.quantity}</Form.Control.Feedback>
                       </InputGroup>
                     </Form.Group>
-
                     {/* Date */}
                     <Form.Group as={Col} xs={12} sm={6} controlId="formFecha">
                       <Form.Label className="mb-1">Fecha</Form.Label>
@@ -197,7 +211,6 @@ export default function useNewSaleModal(
                         <Form.Control.Feedback type="invalid">{errors.date}</Form.Control.Feedback>
                       </InputGroup>
                     </Form.Group>
-
                     {/* Time */}
                     <Form.Group as={Col} xs={12} sm={6} controlId="formTiempo">
                       <Form.Label className="mb-1">Tiempo</Form.Label>
@@ -231,7 +244,6 @@ export default function useNewSaleModal(
                         <Form.Control.Feedback type="invalid">{errors.time}</Form.Control.Feedback>
                       </InputGroup>
                     </Form.Group>
-
                     {/* Pago con tarjeta */}
                     <Form.Group as={Col} xs={12} controlId="formPagoTarjeta">
                       <Form.Label className="mb-1">Pagó con tarjeta</Form.Label>
@@ -290,7 +302,6 @@ export default function useNewSaleModal(
                         ) : null}
                       </InputGroup>
                     </Form.Group>
-
                     {/* Precio especial */}
                     <Form.Group as={Col} xs={12} controlId="formPrecioEspecial">
                       <Form.Label className="mb-1">Precio especial / descuento</Form.Label>
