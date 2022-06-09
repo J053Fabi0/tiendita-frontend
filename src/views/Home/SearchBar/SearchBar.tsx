@@ -4,15 +4,15 @@ import useDebounce from "../../../hooks/useDebounce";
 import { SearchContainer, SearchButton, SearchInput } from "./SearchBarComponents";
 
 interface Props {
-  searchQuery: string;
   setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
+  delay?: number;
 }
-export default function SearchBar({ searchQuery, setSearchQuery }: Props) {
+export default function SearchBar({ setSearchQuery, delay = 200 }: Props) {
   const [tempSearchQuery, setTempSearchQuery] = useState("");
 
   const search = useCallback(() => void setSearchQuery(tempSearchQuery), [tempSearchQuery]);
 
-  useDebounce(search, 200, [search]);
+  useDebounce(search, delay, [search]);
 
   return (
     <div className="w-100 d-flex justify-content-center mb-3">

@@ -93,7 +93,7 @@ export default function Home() {
     <Fragment>
       <Container className="mt-3">
         <Row>
-          <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+          <SearchBar setSearchQuery={setSearchQuery} />
           {/* <Filters /> */}
           <Col>
             <Row>{products === null ? loadingCards : cards}</Row>
