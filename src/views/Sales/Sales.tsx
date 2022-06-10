@@ -1,8 +1,10 @@
 import Caret from "./Sale/Caret";
 import {
   useFrom,
+  useUntil,
   useFromUpdate,
   useSalesState,
+  useUntilUpdate,
   useLoadingSales,
   useFirstSalesLoad,
 } from "../../context/salesContext";
@@ -17,6 +19,7 @@ import SortOption from "./Sale/sortOption.type";
 import SortMethod from "./Sale/sortMethod.type";
 import useSalesSorted from "./Sale/useSalesSorted";
 import { useIsAdmin } from "../../context/personContext";
+import { AlignEnd, AlignStart } from "react-bootstrap-icons";
 import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
 import { Accordion, Card, Col, Container, Form, Nav, Row, Spinner, Table } from "react-bootstrap";
 
@@ -31,8 +34,10 @@ export default function Sales() {
   const [activeTab, setActiveTab] = useState("");
 
   const from = useFrom();
+  const until = useUntil();
   const sales = useSalesState();
   const setFrom = useFromUpdate();
+  const setUntil = useUntilUpdate();
   const loadingSales = useLoadingSales();
   const [salesSorted, setSalesSorted] = useState(sales);
   const [sortOption, setSortOption] = useState<SortOption>("date-up");
@@ -69,14 +74,32 @@ export default function Sales() {
 
             <Accordion.Collapse eventKey="days">
               <Card.Body>
-                Desde{" "}
+                <AlignStart />{" "}
                 <DatePicker
                   value={from}
                   format={"y-MM-dd"}
                   maxDate={new Date()}
                   disabled={loadingSales}
                   disableCalendar={loadingSales}
-                  onChange={((from: Date) => setFrom(from)) as any}
+                  onChange={
+                    ((from: Date) =>
+                      setFrom(from === null ? new Date(new Date().setHours(0, 0, 0, 0)) : from)) as any
+                  }
+                />
+                <br />
+                <AlignEnd />{" "}
+                <DatePicker
+                  value={until}
+                  format={"y-MM-dd"}
+                  maxDate={new Date()}
+                  disabled={loadingSales}
+                  disableCalendar={loadingSales}
+                  onChange={
+                    ((until: Date) =>
+                      setUntil(
+                        until === null ? new Date() : new Date(new Date(until).setHours(23, 59, 59, 999))
+                      )) as any
+                  }
                 />
               </Card.Body>
             </Accordion.Collapse>

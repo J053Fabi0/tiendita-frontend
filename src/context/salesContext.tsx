@@ -3,19 +3,23 @@ import Sale from "../types/sale.type";
 import { useIsAdmin } from "./personContext";
 import useMayLoad from "../hooks/useMayLoad";
 import useLoadData from "../hooks/useLoadData";
-import { useContext, createContext, useState, Dispatch, SetStateAction, useCallback } from "react";
+import { useContext, createContext, useState, useCallback } from "react";
 
 const SalesReloaderContext = createContext(0);
 const SalesContext = createContext<Sale[]>([]);
 const LoadingSalesContext = createContext(true);
 const FromContext = createContext<Date>(new Date());
+const UntilContext = createContext<Date>(new Date());
 const ReloadSalesContext = createContext<() => void>(() => undefined);
 const FirstSalesLoadContext = createContext<() => void>(() => undefined);
-const FromUpdateContext = createContext<Dispatch<SetStateAction<Date>>>(null as any);
+const FromUpdateContext = createContext<(from: Date) => void>(null as any);
+const UntilUpdateContext = createContext<(until: Date) => void>(null as any);
 
 export const useFrom = () => useContext(FromContext);
+export const useUntil = () => useContext(UntilContext);
 export const useSalesState = () => useContext(SalesContext);
 export const useFromUpdate = () => useContext(FromUpdateContext);
+export const useUntilUpdate = () => useContext(UntilUpdateContext);
 export const useReloadSales = () => useContext(ReloadSalesContext);
 export const useLoadingSales = () => useContext(LoadingSalesContext);
 export const useSalesReloader = () => useContext(SalesReloaderContext);
@@ -25,6 +29,7 @@ export function SalesProvider(a: { children: any }) {
   const isAdmin = useIsAdmin();
   const [sales, setSales] = useState<Sale[]>([]);
   const [mayLoad, firstSalesLoad] = useMayLoad();
+  const [until, setUntil] = useState(new Date()); // Max date possible
   const [loadingSales, setLoadingSales] = useState(true);
   const [reloaderState, setReloaderState] = useState(Date.now());
   const [from, setFrom] = useState(new Date(new Date().setHours(0, 0, 0, 0)));
@@ -35,29 +40,42 @@ export function SalesProvider(a: { children: any }) {
   }, [setSales, setReloaderState]);
 
   useLoadData(
-    [from, reloaderState, isAdmin, mayLoad],
+    [from, until, reloaderState, isAdmin, mayLoad],
     setSales,
-    () => http.get<{ message: Sale[] }>("/sales", { params: { from: +from } }),
+    () => http.get<{ message: Sale[] }>("/sales", { params: { from: +from, until: +until } }),
     {
       conditionToStart: isAdmin && mayLoad,
       loadingCB: (loading) => setLoadingSales(loading),
     }
   );
 
+  function publicSetFrom(from: Date) {
+    if (from > until) setUntil(new Date(new Date(from).setHours(23, 59, 59, 999)));
+    setFrom(from);
+  }
+  function publicSetUntil(until: Date) {
+    if (until < from) setFrom(new Date(new Date(until).setHours(0, 0, 0, 0)));
+    setUntil(until);
+  }
+
   return (
     <SalesContext.Provider value={sales}>
       <FromContext.Provider value={from}>
-        <FromUpdateContext.Provider value={setFrom}>
-          <LoadingSalesContext.Provider value={loadingSales}>
-            <ReloadSalesContext.Provider value={reloadSales}>
-              <FirstSalesLoadContext.Provider value={firstSalesLoad}>
-                <SalesReloaderContext.Provider value={reloaderState}>
-                  {/**/}
-                  {a.children}
-                </SalesReloaderContext.Provider>
-              </FirstSalesLoadContext.Provider>
-            </ReloadSalesContext.Provider>
-          </LoadingSalesContext.Provider>
+        <FromUpdateContext.Provider value={publicSetFrom}>
+          <UntilContext.Provider value={until}>
+            <UntilUpdateContext.Provider value={publicSetUntil}>
+              <LoadingSalesContext.Provider value={loadingSales}>
+                <ReloadSalesContext.Provider value={reloadSales}>
+                  <FirstSalesLoadContext.Provider value={firstSalesLoad}>
+                    <SalesReloaderContext.Provider value={reloaderState}>
+                      {/**/}
+                      {a.children}
+                    </SalesReloaderContext.Provider>
+                  </FirstSalesLoadContext.Provider>
+                </ReloadSalesContext.Provider>
+              </LoadingSalesContext.Provider>
+            </UntilUpdateContext.Provider>
+          </UntilContext.Provider>
         </FromUpdateContext.Provider>
       </FromContext.Provider>
     </SalesContext.Provider>
