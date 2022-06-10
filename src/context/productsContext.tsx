@@ -4,6 +4,7 @@ import Product from "../types/product.type";
 import { useAuthTokenReady } from "./personContext";
 import { useContext, createContext, useState, useEffect, useCallback } from "react";
 
+const c = new Intl.Collator();
 const ProductsContext = createContext<Product[] | null>(null);
 const RemoveProductLocallyContext = createContext<(id: number) => void>((_: number) => undefined);
 const ReloadProductContext = createContext<(id: number) => Promise<boolean>>(() => Promise.resolve(false));
@@ -30,15 +31,7 @@ export function ProductsProvider(a: { children: any }) {
         await sleep(1000);
       }
 
-    setProducts(
-      products.sort(({ name: a_name }, { name: b_name }) => {
-        a_name = a_name.toLowerCase();
-        b_name = b_name.toLowerCase();
-        if (a_name < b_name) return -1;
-        if (a_name > b_name) return 1;
-        else return 0;
-      })
-    );
+    setProducts(products.sort(({ name: s1 }, { name: s2 }) => c.compare(s1, s2)));
   }, [authTokenReady]);
 
   useEffect(() => void reloadProducts(), [reloadProducts]);
