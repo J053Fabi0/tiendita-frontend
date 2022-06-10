@@ -1,8 +1,9 @@
 import SortMethod from "./sortMethod.type";
 import SortOption from "./sortOption.type";
 import Sale from "../../../types/sale.type";
-import normalize from "../../../utils/normalize";
 import { Dispatch, SetStateAction, useLayoutEffect } from "react";
+
+const c = new Intl.Collator();
 
 export default function useSalesSorted(
   sales: Sale[],
@@ -33,11 +34,8 @@ export default function useSalesSorted(
           }
 
           case "person":
-          case "product": {
-            const a = normalize(sale1[actualMethod].name).toLowerCase();
-            const b = normalize(sale2[actualMethod].name).toLowerCase();
-            return (a < b ? -1 : a > b ? 1 : 0) * (direction === "down" ? -1 : 1);
-          }
+          case "product":
+            return c.compare(sale1[actualMethod].name, sale2[actualMethod].name) * (direction === "down" ? -1 : 1);
 
           default:
             return 0;
