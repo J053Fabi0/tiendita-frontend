@@ -12,7 +12,7 @@ export default function useCardsFiltered(
     () =>
       products
         ?.filter((product) => {
-          const queries = searchQuery.split(" ");
+          const queries = normalize(searchQuery).split(" ");
           if (queries.length === 0) return true;
 
           for (const query of queries) {
