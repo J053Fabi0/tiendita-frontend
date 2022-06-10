@@ -19,7 +19,7 @@ import SortOption from "./Sale/sortOption.type";
 import SortMethod from "./Sale/sortMethod.type";
 import useSalesSorted from "./Sale/useSalesSorted";
 import { useIsAdmin } from "../../context/personContext";
-import { AlignEnd, AlignStart } from "react-bootstrap-icons";
+import { AlignEnd, AlignStart, ChatLeftTextFill } from "react-bootstrap-icons";
 import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
 import { Accordion, Card, Col, Container, Form, Nav, Row, Spinner, Table } from "react-bootstrap";
 
@@ -156,7 +156,7 @@ export default function Sales() {
                   {salesSorted.map((sale) => {
                     const date = new Date(sale.date);
                     const product = sale.product;
-                    const total = sale.specialPrice ?? sale.quantity * (product?.price ?? 0);
+                    const total = sale.specialPrice ?? sale.quantity * (product.price ?? 0);
                     const dateString =
                       `${addCero(date.getDate())}/${addCero(date.getMonth())}/` +
                       `${date.getFullYear().toString().substring(2)} ` +
@@ -174,9 +174,11 @@ export default function Sales() {
                       <tr key={sale.id}>
                         <TD onClick={handleClick}>{dateString}</TD>
                         <TD onClick={handleClick}>{sale.person.name}</TD>
-                        <TD onClick={handleClick}>{!product ? "Cargando..." : product.name}</TD>
+                        <TD onClick={handleClick}>
+                          {product.name} {sale.comment ? <ChatLeftTextFill /> : null}
+                        </TD>
                         <TD onClick={handleClick}>{sale.quantity}</TD>
-                        <TD onClick={handleClick}>${!product && !sale.specialPrice ? "Cargando..." : total}</TD>
+                        <TD onClick={handleClick}>${total}</TD>
                         <TD onClick={handleClick}>
                           {sale.cash !== total
                             ? sale.cash === 0

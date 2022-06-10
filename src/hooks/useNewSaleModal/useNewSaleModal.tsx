@@ -32,6 +32,7 @@ export default function useNewSaleModal(
   const { medium } = useBreakpoints().lessOrEqualThan;
 
   const schema = Yup.object().shape({
+    comment: Yup.string(),
     quantity: Yup.number()
       .typeError("Ingresa un número.")
       .required("Requerido.")
@@ -134,6 +135,7 @@ export default function useNewSaleModal(
             validate={validate}
             initialValues={{
               quantity: 1,
+              comment: "",
               date: new Date(),
               time: getTimeInFormat(),
 
@@ -183,6 +185,21 @@ export default function useNewSaleModal(
                           isInvalid={!!touched.quantity && !!errors.quantity}
                         />
                         <Form.Control.Feedback type="invalid">{errors.quantity}</Form.Control.Feedback>
+                      </InputGroup>
+                    </Form.Group>
+                    {/* Comment */}
+                    <Form.Group as={Col} xs={12} controlId="formCantidad">
+                      <Form.Label>Comentario</Form.Label>
+                      <InputGroup className="mb-3" hasValidation>
+                        <Form.Control
+                          type="text"
+                          name="comment"
+                          onBlur={handleBlur}
+                          style={{ zIndex: 0 }}
+                          value={values.comment}
+                          disabled={isSubmitting}
+                          onChange={handleChange}
+                        />
                       </InputGroup>
                     </Form.Group>
                     {/* Date */}

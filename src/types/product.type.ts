@@ -1,9 +1,9 @@
 export default interface Product {
+  id: number;
   name: string;
   price: number;
   stock: number;
-  description?: string;
-  id: number;
   tags: number[];
   enabled?: boolean;
+  description?: string;
 }

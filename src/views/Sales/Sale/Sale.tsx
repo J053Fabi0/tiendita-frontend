@@ -138,6 +138,12 @@ export default function SaleView() {
                     {sale.cash !== total ? (sale.cash === 0 ? "Todo" : `$${total - sale.cash} en efectivo`) : "No"}
                   </td>
                 </tr>
+                {sale.comment === undefined ? null : (
+                  <tr>
+                    <th>Comentario</th>
+                    <td>{sale.comment}</td>
+                  </tr>
+                )}
               </tbody>
             </Table>
           </Col>

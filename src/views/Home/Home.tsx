@@ -27,6 +27,9 @@ export default function Home() {
     if (values.specialPriceExists)
       a.specialPrice = values.specialPrice * (values.specialPriceTotal ? 1 : values.quantity);
 
+    const comment = values.comment.trim();
+    if (comment !== "") a.comment = comment;
+
     a.date = (() => {
       const [hour, minute] = values.time.split(":").map((s) => parseInt(s));
       return new Date(values.date).setHours(hour, minute, 0, 0);

@@ -1,13 +1,14 @@
 interface Values {
-  quantity: number;
   date: Date;
   time: string;
-  cardExists: boolean;
-  zeroCash: boolean;
   cash: number;
+  comment: string;
+  quantity: number;
+  zeroCash: boolean;
+  cardExists: boolean;
+  specialPrice: number;
   specialPriceTotal: boolean;
   specialPriceExists: boolean;
-  specialPrice: number;
 }
 
 export default Values;
