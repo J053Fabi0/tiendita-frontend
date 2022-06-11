@@ -77,7 +77,8 @@ export default function useNewSaleModal(
         Yup.number()
           .typeError("Ingresa un número.")
           .required("Requerido")
-          .moreThan(-1e-323, "Solo valores mayores o iguales a 0."),
+          .moreThan(-1e-323, "Solo valores mayores o iguales a 0.")
+          .notOneOf([values.quantity * state.product!.price], "Ese es el precio que tendría sin precio especial."),
         values.specialPrice
       );
     if (specialPrice !== true) errors.specialPrice = specialPrice.join(" ");

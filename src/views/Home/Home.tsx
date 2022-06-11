@@ -44,10 +44,12 @@ export default function Home() {
       await http.post("/sale", a);
       await reloadProduct(product.id);
 
-      reloadSales();
       setShow(false);
     } catch (e) {
+      alert("Hubo un error.");
       console.error((e as any).response.data.error.description);
+    } finally {
+      reloadSales();
     }
   };
 
