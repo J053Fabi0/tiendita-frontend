@@ -67,7 +67,7 @@ export default function SaleView() {
       console.log(e);
     } finally {
       setDeleting(false);
-      reloadSales();
+      reloadSales(true);
       setDeleteModalShow(false);
       goBackOrNavigate(-1, "/");
     }
@@ -148,7 +148,7 @@ export default function SaleView() {
             </Table>
           </Col>
 
-          <Col>
+          <Col className="mb-3">
             <Button variant="danger" onClick={() => setDeleteModalShow(true)}>
               Eliminar
             </Button>

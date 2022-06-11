@@ -10,10 +10,10 @@ const SalesContext = createContext<Sale[]>([]);
 const LoadingSalesContext = createContext(true);
 const FromContext = createContext<Date>(new Date());
 const UntilContext = createContext<Date>(new Date());
-const ReloadSalesContext = createContext<() => void>(() => undefined);
 const FirstSalesLoadContext = createContext<() => void>(() => undefined);
 const FromUpdateContext = createContext<(from: Date) => void>(null as any);
 const UntilUpdateContext = createContext<(until: Date) => void>(null as any);
+const ReloadSalesContext = createContext<(now?: boolean) => void>(() => undefined);
 
 export const useFrom = () => useContext(FromContext);
 export const useUntil = () => useContext(UntilContext);
@@ -25,19 +25,28 @@ export const useLoadingSales = () => useContext(LoadingSalesContext);
 export const useSalesReloader = () => useContext(SalesReloaderContext);
 export const useFirstSalesLoad = () => useContext(FirstSalesLoadContext);
 
+const getFrom = (from?: number | Date) =>
+  new Date((from === undefined ? new Date() : new Date(+from)).setHours(0, 0, 0, 0));
+const getUntil = (until?: number | Date) =>
+  new Date((until === undefined ? new Date() : new Date(+until)).setHours(23, 59, 59, 999));
+
 export function SalesProvider(a: { children: any }) {
   const isAdmin = useIsAdmin();
+  const [from, setFrom] = useState(getFrom());
   const [sales, setSales] = useState<Sale[]>([]);
-  const [mayLoad, firstSalesLoad] = useMayLoad();
-  const [until, setUntil] = useState(new Date()); // Max date possible
+  const [until, setUntil] = useState(getUntil());
   const [loadingSales, setLoadingSales] = useState(true);
   const [reloaderState, setReloaderState] = useState(Date.now());
-  const [from, setFrom] = useState(new Date(new Date().setHours(0, 0, 0, 0)));
+  const [mayLoad, firstSalesLoad, disallowLoading] = useMayLoad();
 
-  const reloadSales = useCallback(() => {
-    setSales([]);
-    setReloaderState(Date.now());
-  }, [setSales, setReloaderState]);
+  const reloadSales = useCallback(
+    (now = false) => {
+      setSales([]);
+      if (now) setReloaderState(Date.now());
+      else disallowLoading();
+    },
+    [setSales, setReloaderState, disallowLoading]
+  );
 
   useLoadData(
     [from, until, reloaderState, isAdmin, mayLoad],
@@ -49,13 +58,15 @@ export function SalesProvider(a: { children: any }) {
     }
   );
 
-  function publicSetFrom(from: Date) {
-    if (from > until) setUntil(new Date(new Date(from).setHours(23, 59, 59, 999)));
-    setFrom(from);
+  function publicSetFrom(newFrom: Date | number) {
+    newFrom = getFrom(newFrom);
+    if (newFrom > until) setUntil(getUntil(newFrom));
+    if (+newFrom !== +from) setFrom(newFrom);
   }
-  function publicSetUntil(until: Date) {
-    if (until < from) setFrom(new Date(new Date(until).setHours(0, 0, 0, 0)));
-    setUntil(until);
+  function publicSetUntil(newUntil: Date | number) {
+    newUntil = getUntil(newUntil);
+    if (newUntil < from) setFrom(getFrom(newUntil));
+    if (+newUntil !== +until) setUntil(newUntil);
   }
 
   return (

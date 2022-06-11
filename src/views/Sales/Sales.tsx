@@ -19,8 +19,8 @@ import SortOption from "./Sale/sortOption.type";
 import SortMethod from "./Sale/sortMethod.type";
 import useSalesSorted from "./Sale/useSalesSorted";
 import { useIsAdmin } from "../../context/personContext";
-import { AlignEnd, AlignStart, ChatLeftTextFill } from "react-bootstrap-icons";
 import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
+import { AlignEnd, AlignStart, ChatLeftTextFill as Chat } from "react-bootstrap-icons";
 import { Accordion, Card, Col, Container, Form, Nav, Row, Spinner, Table } from "react-bootstrap";
 
 export default function Sales() {
@@ -28,7 +28,8 @@ export default function Sales() {
   useRedirectIfTrue(!isAdmin);
 
   const firstSalesLoad = useFirstSalesLoad();
-  useEffect(firstSalesLoad, [firstSalesLoad]);
+  // eslint-disable-next-line
+  useEffect(firstSalesLoad, []);
 
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("");
@@ -175,7 +176,7 @@ export default function Sales() {
                         <TD onClick={handleClick}>{dateString}</TD>
                         <TD onClick={handleClick}>{sale.person.name}</TD>
                         <TD onClick={handleClick}>
-                          {product.name} {sale.comment ? <ChatLeftTextFill /> : null}
+                          {product.name} {sale.comment ? <Chat /> : null}
                         </TD>
                         <TD onClick={handleClick}>{sale.quantity}</TD>
                         <TD onClick={handleClick}>${total}</TD>
