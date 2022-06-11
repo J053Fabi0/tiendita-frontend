@@ -4,6 +4,7 @@ import {
   useUntil,
   useFromUpdate,
   useSalesState,
+  useReloadSales,
   useUntilUpdate,
   useLoadingSales,
   useFirstSalesLoad,
@@ -20,8 +21,8 @@ import SortMethod from "./Sale/sortMethod.type";
 import useSalesSorted from "./Sale/useSalesSorted";
 import { useIsAdmin } from "../../context/personContext";
 import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
-import { AlignEnd, AlignStart, ChatLeftTextFill as Chat } from "react-bootstrap-icons";
-import { Accordion, Card, Col, Container, Form, Nav, Row, Spinner, Table } from "react-bootstrap";
+import { AlignEnd, AlignStart, ArrowClockwise, ChatLeftTextFill as Chat } from "react-bootstrap-icons";
+import { Accordion, Button, Card, Col, Container, Form, Nav, Row, Spinner, Table } from "react-bootstrap";
 
 export default function Sales() {
   const isAdmin = useIsAdmin();
@@ -39,6 +40,7 @@ export default function Sales() {
   const sales = useSalesState();
   const setFrom = useFromUpdate();
   const setUntil = useUntilUpdate();
+  const reloadSales = useReloadSales();
   const loadingSales = useLoadingSales();
   const [salesSorted, setSalesSorted] = useState(sales);
   const [sortOption, setSortOption] = useState<SortOption>("date-up");
@@ -71,6 +73,10 @@ export default function Sales() {
             <Nav variant="pills" activeKey={activeTab} defaultActiveKey="days" onSelect={handleTabSelect}>
               <CustomToggle eventKey="days">Día</CustomToggle>
               {/* <CustomToggle eventKey="persons">Personas</CustomToggle> */}
+
+              <Button variant="light" onClick={() => reloadSales(true)}>
+                {loadingSales ? <Spinner animation="border" size="sm" /> : <ArrowClockwise />}
+              </Button>
             </Nav>
 
             <Accordion.Collapse eventKey="days">
