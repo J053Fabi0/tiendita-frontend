@@ -13,7 +13,6 @@ import styled from "@emotion/styled";
 import addCero from "../../utils/addCero";
 import CustomToggle from "./CustomToggle";
 import DatePicker from "react-date-picker";
-import useArray from "../../hooks/useArray";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SortOption from "./Sale/sortOption.type";
@@ -21,6 +20,7 @@ import SortMethod from "./Sale/sortMethod.type";
 import useSalesSorted from "./Sale/useSalesSorted";
 import { useIsAdmin } from "../../context/personContext";
 import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
+import { useSalesSelected } from "../../context/selectedSalesContext";
 import { AlignEnd, AlignStart, ArrowClockwise, ChatLeftTextFill as Chat } from "react-bootstrap-icons";
 import { Accordion, Button, Card, Col, Container, Form, Nav, Row, Spinner, Table } from "react-bootstrap";
 
@@ -44,7 +44,7 @@ export default function Sales() {
   const loadingSales = useLoadingSales();
   const [salesSorted, setSalesSorted] = useState(sales);
   const [sortOption, setSortOption] = useState<SortOption>("date-up");
-  const [salesSelected, { remove, push, clear }] = useArray<number>();
+  const [salesSelected, { remove, push, clear }] = useSalesSelected();
 
   const handleTabSelect = (tab: string | null) => {
     if (tab === null) return;

@@ -11,6 +11,7 @@ import { SalesProvider } from "./context/salesContext";
 import { PersonProvider } from "./context/personContext";
 import { ProductsProvider } from "./context/productsContext";
 import { TagsAndCategoriesProvider } from "./context/tagsAndCategoriesContext";
+import { SelectedSalesProvider } from "./context/selectedSalesContext";
 
 export default function App() {
   return (
@@ -19,24 +20,26 @@ export default function App() {
         <ProductsProvider>
           <SalesProvider>
             <TagsAndCategoriesProvider>
-              <BrowserRouter>
-                <Navbar
-                  links={[
-                    { path: "/", title: "Vender" },
-                    { path: "/productos", title: "Productos", onlyAdmins: true },
-                    { path: "/ventas", title: "Ventas", onlyAdmins: true },
-                  ]}
-                />
+              <SelectedSalesProvider>
+                <BrowserRouter>
+                  <Navbar
+                    links={[
+                      { path: "/", title: "Vender" },
+                      { path: "/productos", title: "Productos", onlyAdmins: true },
+                      { path: "/ventas", title: "Ventas", onlyAdmins: true },
+                    ]}
+                  />
 
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/ventas" element={<Sales />} />
-                  <Route path="/productos" element={<Products />} />
-                  <Route path="/ventas/:id" element={<SaleView />} />
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/ventas" element={<Sales />} />
+                    <Route path="/productos" element={<Products />} />
+                    <Route path="/ventas/:id" element={<SaleView />} />
 
-                  <Route path="*" element={<Home />} />
-                </Routes>
-              </BrowserRouter>
+                    <Route path="*" element={<Home />} />
+                  </Routes>
+                </BrowserRouter>
+              </SelectedSalesProvider>
             </TagsAndCategoriesProvider>
           </SalesProvider>
         </ProductsProvider>
