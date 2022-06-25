@@ -140,9 +140,9 @@ export default function useNewSaleModal(
               date: new Date(),
               time: getTimeInFormat(),
 
+              cash: undefined as unknown as number,
               cardExists: false,
               zeroCash: true,
-              cash: undefined as unknown as number,
 
               specialPriceTotal: true,
               specialPriceExists: false,

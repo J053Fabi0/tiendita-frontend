@@ -187,11 +187,7 @@ export default function Sales() {
                         <TD onClick={handleClick}>{sale.quantity}</TD>
                         <TD onClick={handleClick}>${total}</TD>
                         <TD onClick={handleClick}>
-                          {sale.cash !== total
-                            ? sale.cash === 0
-                              ? "Todo"
-                              : `$${total - sale.cash} en efectivo`
-                            : "No"}
+                          {sale.cash !== total ? (sale.cash === 0 ? "Todo" : `$${sale.cash} en efectivo`) : "No"}
                         </TD>
                         <TD onClick={handleCheck}>
                           <FormCheck
