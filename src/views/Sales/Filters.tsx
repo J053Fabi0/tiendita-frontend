@@ -1,21 +1,27 @@
+import { useState } from "react";
+import {
+  useFrom,
+  useUntil,
+  useFromUpdate,
+  useUntilUpdate,
+  useReloadSales,
+  useLoadingSales,
+} from "../../context/salesContext";
 import CustomToggle from "./CustomToggle";
 import DatePicker from "react-date-picker";
-import { Dispatch, SetStateAction } from "react";
 import { AlignEnd, AlignStart, ArrowClockwise } from "react-bootstrap-icons";
 import { Accordion, Button, Card, Col, Nav, Row, Spinner } from "react-bootstrap";
 
-interface Props {
-  loadingSales: boolean;
-  fromState: [Date, (from: Date) => void];
-  untilState: [Date, (until: Date) => void];
-  reloadSales: (now?: boolean | undefined) => void;
-  activeTabState: [string, Dispatch<SetStateAction<string>>];
-}
+interface Props {}
 
-export default function Filters({ activeTabState, reloadSales, loadingSales, untilState, fromState }: Props) {
-  const [from, setFrom] = fromState;
-  const [until, setUntil] = untilState;
-  const [activeTab, setActiveTab] = activeTabState;
+export default function Filters({}: Props) {
+  const from = useFrom();
+  const until = useUntil();
+  const setFrom = useFromUpdate();
+  const setUntil = useUntilUpdate();
+  const reloadSales = useReloadSales();
+  const loadingSales = useLoadingSales();
+  const [activeTab, setActiveTab] = useState("");
 
   const handleTabSelect = (tab: string | null) => {
     if (tab === null) return;

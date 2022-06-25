@@ -1,14 +1,5 @@
 import Caret from "./Sale/Caret";
-import {
-  useFrom,
-  useUntil,
-  useFromUpdate,
-  useSalesState,
-  useReloadSales,
-  useUntilUpdate,
-  useLoadingSales,
-  useFirstSalesLoad,
-} from "../../context/salesContext";
+import { useSalesState, useLoadingSales, useFirstSalesLoad } from "../../context/salesContext";
 import styled from "@emotion/styled";
 import addCero from "../../utils/addCero";
 import { useEffect, useState } from "react";
@@ -32,14 +23,8 @@ export default function Sales() {
   useEffect(firstSalesLoad, []);
 
   const navigate = useNavigate();
-  const activeTabState = useState("");
 
-  const from = useFrom();
-  const until = useUntil();
   const sales = useSalesState();
-  const setFrom = useFromUpdate();
-  const setUntil = useUntilUpdate();
-  const reloadSales = useReloadSales();
   const loadingSales = useLoadingSales();
   const [salesSorted, setSalesSorted] = useState(sales);
   const [sortOption, setSortOption] = useState<SortOption>("date-up");
@@ -61,13 +46,7 @@ export default function Sales() {
 
   return !isAdmin ? null : (
     <Container>
-      <Filters
-        reloadSales={reloadSales}
-        fromState={[from, setFrom]}
-        loadingSales={loadingSales}
-        untilState={[until, setUntil]}
-        activeTabState={activeTabState}
-      />
+      <Filters />
 
       <Row className="mt-3">
         {loadingSales || sales.length === 0 ? (
