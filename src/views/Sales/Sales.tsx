@@ -165,7 +165,7 @@ export default function Sales() {
                     const product = sale.product;
                     const total = sale.specialPrice ?? sale.quantity * (product.price ?? 0);
                     const dateString =
-                      `${addCero(date.getDate())}/${addCero(date.getMonth())}/` +
+                      `${addCero(date.getDate())}/${addCero(date.getMonth() + 1)}/` +
                       `${date.getFullYear().toString().substring(2)} ` +
                       `${addCero(date.getHours())}:${addCero(date.getMinutes())}`;
 
