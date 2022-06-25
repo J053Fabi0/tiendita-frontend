@@ -142,7 +142,7 @@ export default function useNewSaleModal(
 
               cardExists: false,
               zeroCash: true,
-              cash: 1,
+              cash: undefined as unknown as number,
 
               specialPriceTotal: true,
               specialPriceExists: false,
