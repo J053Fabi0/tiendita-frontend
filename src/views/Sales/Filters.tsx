@@ -10,6 +10,8 @@ import {
 import styled from "@emotion/styled";
 import CustomToggle from "./CustomToggle";
 import DatePicker from "react-date-picker";
+import useArray from "../../hooks/useArray";
+import useDebounce from "../../hooks/useDebounce";
 import { useIsAdmin } from "../../context/personContext";
 import { useSelectedPersons } from "../../context/selectedThingsContext";
 import { AlignEnd, AlignStart, ArrowClockwise } from "react-bootstrap-icons";
@@ -30,7 +32,11 @@ export default function Filters() {
 
   const persons = usePersons();
   const loadingPersons = useLoadingPersons();
-  const [selectedPersons, { push: pushPerson, remove: removePerson, clear: clearPersons }] = useSelectedPersons();
+  const [globalSelectedPersons, { set }] = useSelectedPersons();
+  const [selectedPersons, { push: pushPerson, remove: removePerson, clear: clearPersons }] =
+    useArray<number>(globalSelectedPersons);
+
+  useDebounce(() => set(selectedPersons), 800, [selectedPersons]);
 
   const handleTabSelect = (tab: string | null) => {
     if (tab === null) return;
