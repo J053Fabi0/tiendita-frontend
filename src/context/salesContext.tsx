@@ -3,6 +3,7 @@ import Sale from "../types/sale.type";
 import { useIsAdmin } from "./personContext";
 import useMayLoad from "../hooks/useMayLoad";
 import useLoadData from "../hooks/useLoadData";
+import { useSelectedPersons } from "./selectedThingsContext";
 import { useContext, createContext, useState, useCallback } from "react";
 
 const SalesReloaderContext = createContext(0);
@@ -33,6 +34,7 @@ const getUntil = (until?: number | Date) =>
 export function SalesProvider(a: { children: any }) {
   const isAdmin = useIsAdmin();
   const [from, setFrom] = useState(getFrom());
+  const [selectedPersons] = useSelectedPersons();
   const [sales, setSales] = useState<Sale[]>([]);
   const [until, setUntil] = useState(getUntil());
   const [loadingSales, setLoadingSales] = useState(true);
@@ -49,9 +51,13 @@ export function SalesProvider(a: { children: any }) {
   );
 
   useLoadData(
-    [from, until, reloaderState, isAdmin, mayLoad],
+    [from, until, reloaderState, isAdmin, mayLoad, selectedPersons],
     setSales,
-    () => http.get<{ message: Sale[] }>("/sales", { params: { from: +from, until: +until } }),
+    () => {
+      const params = { from: +from, until: +until } as any;
+      if (selectedPersons.length >= 1) params.persons = selectedPersons;
+      return http.get<{ message: Sale[] }>("/sales", { params });
+    },
     {
       conditionToStart: isAdmin && mayLoad,
       loadingCB: (loading) => setLoadingSales(loading),

@@ -10,7 +10,7 @@ import useSalesSorted from "./Sale/useSalesSorted";
 import { useIsAdmin } from "../../context/personContext";
 import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
 import { ChatLeftTextFill as Chat } from "react-bootstrap-icons";
-import { useSalesSelected } from "../../context/selectedSalesContext";
+import { useSelectedSales } from "../../context/selectedThingsContext";
 import { Col, Container, Form, Row, Spinner, Table } from "react-bootstrap";
 import Filters from "./Filters";
 
@@ -19,8 +19,7 @@ export default function Sales() {
   useRedirectIfTrue(!isAdmin);
 
   const firstSalesLoad = useFirstSalesLoad();
-  // eslint-disable-next-line
-  useEffect(firstSalesLoad, []);
+  useEffect(firstSalesLoad, [firstSalesLoad]);
 
   const navigate = useNavigate();
 
@@ -28,7 +27,7 @@ export default function Sales() {
   const loadingSales = useLoadingSales();
   const [salesSorted, setSalesSorted] = useState(sales);
   const [sortOption, setSortOption] = useState<SortOption>("date-up");
-  const [salesSelected, { remove, push, clear }] = useSalesSelected();
+  const [salesSelected, { remove, push, clear }] = useSelectedSales();
 
   useSalesSorted(sales, setSalesSorted, sortOption);
 
