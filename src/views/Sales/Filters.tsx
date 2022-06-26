@@ -36,7 +36,11 @@ export default function Filters() {
   const [selectedPersons, { push: pushPerson, remove: removePerson, clear: clearPersons }] =
     useArray<number>(globalSelectedPersons);
 
-  useDebounce(() => set(selectedPersons), 800, [selectedPersons]);
+  useDebounce(
+    () => globalSelectedPersons.sort().join("") !== selectedPersons.sort().join("") && set(selectedPersons),
+    800,
+    [selectedPersons]
+  );
 
   const handleTabSelect = (tab: string | null) => {
     if (tab === null) return;
@@ -108,9 +112,9 @@ export default function Filters() {
                       key="all"
                       type="checkbox"
                       className="me-2 mb-2"
-                      onClick={clearPersons}
                       variant="outline-secondary"
                       active={selectedPersons.length === 0}
+                      onClick={() => selectedPersons.length > 0 && clearPersons()}
                     >
                       Todos
                     </NoHoverToggle>,
