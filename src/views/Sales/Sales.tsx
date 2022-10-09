@@ -1,5 +1,5 @@
+import Filters from "./Filters";
 import Caret from "./Sale/Caret";
-import { useSalesState, useLoadingSales, useFirstSalesLoad } from "../../context/salesContext";
 import styled from "@emotion/styled";
 import addCero from "../../utils/addCero";
 import { useEffect, useState } from "react";
@@ -12,7 +12,7 @@ import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
 import { ChatLeftTextFill as Chat } from "react-bootstrap-icons";
 import { useSelectedSales } from "../../context/selectedThingsContext";
 import { Col, Container, Form, Row, Spinner, Table } from "react-bootstrap";
-import Filters from "./Filters";
+import { useSalesState, useLoadingSales, useFirstSalesLoad } from "../../context/salesContext";
 
 export default function Sales() {
   const isAdmin = useIsAdmin();
@@ -139,6 +139,10 @@ export default function Sales() {
 
             {salesSelected.length === 0 ? null : (
               <>
+                <Col xs={12} className="w-100 d-flex justify-content-end">
+                  <b>Cantidad:</b>&#8201;
+                  {sales?.filter(({ id }) => salesSelected.includes(id)).reduce((c, s) => s.quantity + c, 0)}
+                </Col>
                 <Col xs={12} className="w-100 d-flex justify-content-end">
                   <b>Total seleccionado:</b>&#8201;$
                   {sales
