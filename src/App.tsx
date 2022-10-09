@@ -1,18 +1,19 @@
 import theme from "./styles/theme";
 import Home from "./views/Home/Home";
 import { Navbar } from "./components";
-import SaleView from "./views/Sales/Sale/Sale";
 import Sales from "./views/Sales/Sales";
+import SaleView from "./views/Sales/Sale/Sale";
 import Products from "./views/Products/Products";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
+import TelegramConnect from "./views/TelegramConnect/TelegramConnect";
 
 import { ThemeProvider } from "@emotion/react";
 import { SalesProvider } from "./context/salesContext";
 import { PersonProvider } from "./context/personContext";
-import { ProductsProvider } from "./context/productsContext";
-import { TagsAndCategoriesProvider } from "./context/tagsAndCategoriesContext";
-import { SelectedThingsProvider } from "./context/selectedThingsContext";
 import { PersonsProvider } from "./context/personsContext";
+import { ProductsProvider } from "./context/productsContext";
+import { SelectedThingsProvider } from "./context/selectedThingsContext";
+import { TagsAndCategoriesProvider } from "./context/tagsAndCategoriesContext";
 
 export default function App() {
   return (
@@ -37,6 +38,7 @@ export default function App() {
                       <Route path="/ventas" element={<Sales />} />
                       <Route path="/productos" element={<Products />} />
                       <Route path="/ventas/:id" element={<SaleView />} />
+                      <Route path="/telegram" element={<TelegramConnect />} />
 
                       <Route path="*" element={<Home />} />
                     </Routes>

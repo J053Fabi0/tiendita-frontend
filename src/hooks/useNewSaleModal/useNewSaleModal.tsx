@@ -217,6 +217,7 @@ export default function useNewSaleModal(
                           disabled={isSubmitting}
                           disableCalendar={isSubmitting}
                           value={values.date as unknown as string}
+                          isInvalid={!!touched.date && !!errors.date}
                           onCalendarClose={() => handleBlur({ target: { name: "date" } })}
                           onChange={
                             ((value: string) =>
@@ -224,7 +225,6 @@ export default function useNewSaleModal(
                                 target: { value: value === null ? "" : value, name: "date" },
                               })) as any
                           }
-                          isInvalid={!!touched.date && !!errors.date}
                         />
                         <Form.Control.Feedback type="invalid">{errors.date}</Form.Control.Feedback>
                       </InputGroup>

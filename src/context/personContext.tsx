@@ -3,12 +3,16 @@ import http from "../http-common";
 import { useEffect } from "react";
 import Person from "../types/Person.type";
 import useCookie from "../hooks/useCookie";
+import Dropdown from "react-bootstrap/Dropdown";
 import SignInQuery from "../types/signinQuery.type";
 import { Formik, Form as FormikForm } from "formik";
 import { useLocalStorage } from "../hooks/useStorage";
 import SignInResult from "../types/signInResult.type";
+import TelegramLoginButton from "telegram-login-button";
 import { useContext, createContext, useState } from "react";
+import SignInTelegramQuery from "../types/signinTelegramQuery.type";
 import { Alert, Button, Col, Form, InputGroup, Modal, Row } from "react-bootstrap";
+import constants from "../utils/constants";
 
 const AuthTokenContext = createContext<string>("");
 const IsAdminContext = createContext<boolean>(false);
@@ -46,10 +50,12 @@ export function PersonProvider(a: { children: any }) {
     password: Yup.string().required("Requerido."),
   });
 
-  const handleOnSubmit = async (values: SignInQuery) => {
+  const handleOnSubmit = async (values: SignInQuery | SignInTelegramQuery) => {
     try {
-      const { authToken, person } = (await http.get<SignInResult>("/signin", { params: { ...values } })).data
-        .message;
+      const { authToken, person } = (
+        await http.get<SignInResult>("hash" in values ? "/signinTelegram" : "/signin", { params: { ...values } })
+      ).data.message;
+
       http.defaults.headers.common["Authorization"] = authToken;
       setAuthToken(authToken);
       setPerson(person);
@@ -79,7 +85,7 @@ export function PersonProvider(a: { children: any }) {
       >
         {({ values, errors, touched, handleBlur, handleSubmit, handleChange, isSubmitting }) => (
           <FormikForm onSubmit={handleSubmit}>
-            <Modal.Body>
+            <Modal.Body className="pb-1">
               <Row>
                 <Alert
                   dismissible
@@ -90,7 +96,29 @@ export function PersonProvider(a: { children: any }) {
                 >
                   {error}
                 </Alert>
+              </Row>
 
+              <div className="d-flex align-items-center w-100 mb-2">
+                <Dropdown.Divider className="w-100" />
+                <p className="mx-1 my-0 text-nowrap">Mediante Telegram</p>
+                <Dropdown.Divider className="w-100" />
+              </div>
+
+              <Row className="pt-1">
+                <div className="d-flex justify-content-center align-items-center w-100 mb-0 px-0">
+                  <TelegramLoginButton
+                    usePic
+                    className="w-auto"
+                    requestAccess={false}
+                    botName={constants.BOT_USERNAME}
+                    dataOnauth={(authData) => handleOnSubmit(authData)}
+                  />
+                </div>
+              </Row>
+
+              <Dropdown.Divider />
+
+              <Row>
                 {/* Username */}
                 <Form.Group as={Col} xs={12} controlId="formUsername">
                   <Form.Label>Nombre de usuario</Form.Label>
