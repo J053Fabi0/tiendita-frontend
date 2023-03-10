@@ -13,6 +13,9 @@ import { ChatLeftTextFill as Chat } from "react-bootstrap-icons";
 import { useSelectedSales } from "../../context/selectedThingsContext";
 import { Col, Container, Form, Row, Spinner, Table } from "react-bootstrap";
 import { useSalesState, useLoadingSales, useFirstSalesLoad } from "../../context/salesContext";
+import Sale from "../../types/sale.type";
+
+const getTotal = (sale: Sale) => sale.quantity * (sale.specialPrice ?? sale.product.price ?? 0);
 
 export default function Sales() {
   const isAdmin = useIsAdmin();
@@ -96,7 +99,7 @@ export default function Sales() {
                   {salesSorted.map((sale) => {
                     const date = new Date(sale.date);
                     const product = sale.product;
-                    const total = sale.specialPrice ?? sale.quantity * (product.price ?? 0);
+                    const total = getTotal(sale);
                     const dateString =
                       `${addCero(date.getDate())}/${addCero(date.getMonth() + 1)}/` +
                       `${date.getFullYear().toString().substring(2)} ` +
@@ -147,29 +150,20 @@ export default function Sales() {
                   <b>Total seleccionado:</b>&#8201;$
                   {sales
                     ?.filter(({ id }) => salesSelected.includes(id))
-                    .reduce(
-                      (prev, sale) => prev + (sale.specialPrice ?? sale.quantity * (sale.product.price ?? 0)),
-                      0
-                    )}
+                    .reduce((prev, sale) => prev + getTotal(sale), 0)}
                 </Col>
                 <Col xs={12} className="w-100 d-flex justify-content-end">
                   <b>Resto:</b>&#8201;$
                   {sales
                     ?.filter(({ id }) => !salesSelected.includes(id))
-                    .reduce(
-                      (prev, sale) => prev + (sale.specialPrice ?? sale.quantity * (sale.product.price ?? 0)),
-                      0
-                    )}
+                    .reduce((prev, sale) => prev + getTotal(sale), 0)}
                 </Col>
               </>
             )}
 
             <Col xs={12} className="w-100 d-flex justify-content-end">
               <b>Total:</b>&#8201;$
-              {sales?.reduce(
-                (prev, sale) => prev + (sale.specialPrice ?? sale.quantity * (sale.product.price ?? 0)),
-                0
-              )}
+              {sales?.reduce((prev, sale) => prev + getTotal(sale), 0)}
             </Col>
 
             <div className="mt-3" />

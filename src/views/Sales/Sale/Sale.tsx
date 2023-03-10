@@ -56,7 +56,7 @@ export default function SaleView() {
   const [dateString, setDateString] = useState(+date === 0 ? "" : getDateString(date));
   useUpdateEffect(() => setDateString(getDateString(date)), [date]);
 
-  const total = sale ? sale.specialPrice ?? sale.quantity * (product?.price ?? 0) : 0;
+  const total = sale ? (sale.specialPrice ?? product?.price ?? 0) * sale.quantity : 0;
 
   const [deleting, setDeleting] = useState(false);
   const handleDelete = useCallback(async () => {

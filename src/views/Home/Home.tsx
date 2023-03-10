@@ -37,7 +37,7 @@ export default function Home() {
 
     a.cash = (() => {
       if (values.cardExists) return values.zeroCash ? 0 : values.cash;
-      else return a.specialPrice ?? product.price * values.quantity;
+      return (a.specialPrice ?? product.price) * values.quantity;
     })();
 
     try {
