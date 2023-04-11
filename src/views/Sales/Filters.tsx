@@ -6,6 +6,7 @@ import {
   useUntilUpdate,
   useReloadSales,
   useLoadingSales,
+  useSalesState,
 } from "../../context/salesContext";
 import styled from "@emotion/styled";
 import CustomToggle from "./CustomToggle";
@@ -14,14 +15,28 @@ import useArray from "../../hooks/useArray";
 import useDebounce from "../../hooks/useDebounce";
 import { useIsAdmin } from "../../context/personContext";
 import { useSelectedPersons } from "../../context/selectedThingsContext";
-import { AlignEnd, AlignStart, ArrowClockwise } from "react-bootstrap-icons";
+import { AlignEnd, AlignStart, ArrowClockwise, Download } from "react-bootstrap-icons";
 import { Accordion, Button, Card, Col, Nav, Row, Spinner, ToggleButton } from "react-bootstrap";
 import { useFirstPersonsLoad, useLoadingPersons, usePersons } from "../../context/personsContext";
+import downloadCSV from "../../utils/downloadDataAsCSV";
+import { getTotal } from "./Sales";
+
+const NoHoverToggle = styled(ToggleButton)(({ active }) => ({
+  ":hover": {
+    backgroundColor: active ? "#6c757d" : "white",
+    color: active ? "white" : "#6c757d",
+  },
+}));
+
+const ButtonMarginLeft = styled(Button)({
+  marginLeft: "0.5rem",
+});
 
 export default function Filters() {
   const from = useFrom();
   const until = useUntil();
   const isAdmin = useIsAdmin();
+  const sales = useSalesState();
   const setFrom = useFromUpdate();
   const setUntil = useUntilUpdate();
   const reloadSales = useReloadSales();
@@ -48,13 +63,6 @@ export default function Filters() {
     setActiveTab(tab !== activeTab ? tab : "");
   };
 
-  const NoHoverToggle = styled(ToggleButton)(({ active }) => ({
-    ":hover": {
-      backgroundColor: active ? "#6c757d" : "white",
-      color: active ? "white" : "#6c757d",
-    },
-  }));
-
   return (
     <Row className="mt-3">
       <Col className="d-flex justify-content-center">
@@ -66,6 +74,39 @@ export default function Filters() {
             <Button variant="light" onClick={() => reloadSales(true)}>
               {loadingSales ? <Spinner animation="border" size="sm" /> : <ArrowClockwise />}
             </Button>
+
+            <ButtonMarginLeft
+              disabled={loadingSales}
+              variant="light"
+              onClick={downloadCSV([
+                [
+                  "Producto ID",
+                  "Producto",
+                  "Precio",
+                  "Fecha",
+                  "Persona",
+                  "Total",
+                  "¿Pagó con tarjeta?",
+                  "Efectivo entregado",
+                  "Precio especial",
+                  "Comentario",
+                ],
+                ...sales.map((sale) => [
+                  sale.product.id,
+                  sale.product.name,
+                  sale.product.price,
+                  new Date(sale.date).toISOString(),
+                  sale.person.name,
+                  getTotal(sale),
+                  sale.cash !== getTotal(sale) ? "TRUE" : "FALSE",
+                  sale.cash,
+                  sale.specialPrice || "",
+                  sale.comment || "",
+                ]),
+              ])}
+            >
+              <Download />
+            </ButtonMarginLeft>
           </Nav>
 
           <Accordion.Collapse eventKey="days">

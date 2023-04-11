@@ -1,6 +1,7 @@
 import Filters from "./Filters";
 import Caret from "./Sale/Caret";
 import styled from "@emotion/styled";
+import Sale from "../../types/sale.type";
 import addCero from "../../utils/addCero";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -13,9 +14,8 @@ import { ChatLeftTextFill as Chat } from "react-bootstrap-icons";
 import { useSelectedSales } from "../../context/selectedThingsContext";
 import { Col, Container, Form, Row, Spinner, Table } from "react-bootstrap";
 import { useSalesState, useLoadingSales, useFirstSalesLoad } from "../../context/salesContext";
-import Sale from "../../types/sale.type";
 
-const getTotal = (sale: Sale) => sale.quantity * (sale.specialPrice ?? sale.product.price ?? 0);
+export const getTotal = (sale: Sale) => sale.quantity * (sale.specialPrice ?? sale.product.price ?? 0);
 
 export default function Sales() {
   const isAdmin = useIsAdmin();
