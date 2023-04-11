@@ -78,32 +78,47 @@ export default function Filters() {
             <ButtonMarginLeft
               disabled={loadingSales}
               variant="light"
-              onClick={downloadCSV([
-                [
-                  "Producto ID",
-                  "Producto",
-                  "Precio",
-                  "Fecha",
-                  "Persona",
-                  "Total",
-                  "¿Pagó con tarjeta?",
-                  "Efectivo entregado",
-                  "Precio especial",
-                  "Comentario",
-                ],
-                ...sales.map((sale) => [
-                  sale.product.id,
-                  sale.product.name,
-                  sale.product.price,
-                  new Date(sale.date).toISOString(),
-                  sale.person.name,
-                  getTotal(sale),
-                  sale.cash !== getTotal(sale) ? "TRUE" : "FALSE",
-                  sale.cash,
-                  sale.specialPrice || "",
-                  sale.comment || "",
-                ]),
-              ])}
+              onClick={() =>
+                downloadCSV([
+                  [
+                    "Producto ID",
+                    "Producto",
+                    "Precio",
+                    "Año",
+                    "Mes",
+                    "Día",
+                    "Día de la semana",
+                    "Hora",
+                    "Minuto",
+                    "Persona",
+                    "Total",
+                    "¿Pagó con tarjeta?",
+                    "Efectivo entregado",
+                    "Precio especial",
+                    "Comentario",
+                  ],
+                  ...sales.map((sale) => {
+                    const date = new Date(sale.date);
+                    return [
+                      sale.product.id,
+                      sale.product.name,
+                      sale.product.price,
+                      date.getFullYear(),
+                      date.getMonth() + 1,
+                      date.getDate(),
+                      new Intl.DateTimeFormat("es-ES", { weekday: "long" }).format(date),
+                      date.getHours(),
+                      date.getMinutes(),
+                      sale.person.name,
+                      getTotal(sale),
+                      sale.cash !== getTotal(sale) ? "TRUE" : "FALSE",
+                      sale.cash,
+                      sale.specialPrice || "",
+                      sale.comment || "",
+                    ];
+                  }),
+                ])
+              }
             >
               <Download />
             </ButtonMarginLeft>
