@@ -1,9 +1,9 @@
 import Filters from "./Filters";
 import Caret from "./Sale/Caret";
 import styled from "@emotion/styled";
-import Sale from "../../types/sale.type";
 import addCero from "../../utils/addCero";
 import { useEffect, useState } from "react";
+import getTotal from "../../utils/getTotal";
 import { useNavigate } from "react-router-dom";
 import SortOption from "./Sale/sortOption.type";
 import SortMethod from "./Sale/sortMethod.type";
@@ -14,8 +14,6 @@ import { ChatLeftTextFill as Chat } from "react-bootstrap-icons";
 import { useSelectedSales } from "../../context/selectedThingsContext";
 import { Col, Container, Form, Row, Spinner, Table } from "react-bootstrap";
 import { useSalesState, useLoadingSales, useFirstSalesLoad } from "../../context/salesContext";
-
-export const getTotal = (sale: Sale) => sale.specialPrice ?? sale.quantity * (sale.product.price ?? 0);
 
 const TD = styled.td(`cursor: pointer;`);
 const FormCheck = styled(Form.Check)(`cursor: pointer;`);

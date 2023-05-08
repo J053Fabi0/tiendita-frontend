@@ -1,25 +1,25 @@
-import { useState } from "react";
 import {
   useFrom,
   useUntil,
   useFromUpdate,
+  useSalesState,
   useUntilUpdate,
   useReloadSales,
   useLoadingSales,
-  useSalesState,
 } from "../../context/salesContext";
+import { useState } from "react";
 import styled from "@emotion/styled";
 import CustomToggle from "./CustomToggle";
 import DatePicker from "react-date-picker";
 import useArray from "../../hooks/useArray";
+import getTotal from "../../utils/getTotal";
 import useDebounce from "../../hooks/useDebounce";
+import downloadCSV from "../../utils/downloadDataAsCSV";
 import { useIsAdmin } from "../../context/personContext";
 import { useSelectedPersons } from "../../context/selectedThingsContext";
 import { AlignEnd, AlignStart, ArrowClockwise, Download } from "react-bootstrap-icons";
 import { Accordion, Button, Card, Col, Nav, Row, Spinner, ToggleButton } from "react-bootstrap";
 import { useFirstPersonsLoad, useLoadingPersons, usePersons } from "../../context/personsContext";
-import downloadCSV from "../../utils/downloadDataAsCSV";
-import { getTotal } from "./Sales";
 
 const NoHoverToggle = styled(ToggleButton)(({ active }) => ({
   ":hover": {

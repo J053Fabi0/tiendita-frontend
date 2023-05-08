@@ -1,4 +1,5 @@
 import http from "../../http-common";
+import getTotal from "../../utils/getTotal";
 import Values from "../../types/values.type";
 import Card from "../../components/Card/Card";
 import SearchBar from "./SearchBar/SearchBar";
@@ -37,7 +38,11 @@ export default function Home() {
 
     a.cash = (() => {
       if (values.cardExists) return values.zeroCash ? 0 : values.cash;
-      return (a.specialPrice ?? product.price) * values.quantity;
+      return getTotal({
+        product,
+        quantity: values.quantity,
+        specialPrice: values.specialPriceExists ? a.specialPrice : undefined,
+      });
     })();
 
     try {
