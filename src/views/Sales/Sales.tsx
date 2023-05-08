@@ -15,7 +15,11 @@ import { useSelectedSales } from "../../context/selectedThingsContext";
 import { Col, Container, Form, Row, Spinner, Table } from "react-bootstrap";
 import { useSalesState, useLoadingSales, useFirstSalesLoad } from "../../context/salesContext";
 
-export const getTotal = (sale: Sale) => sale.quantity * (sale.specialPrice ?? sale.product.price ?? 0);
+export const getTotal = (sale: Sale) => sale.specialPrice ?? sale.quantity * (sale.product.price ?? 0);
+
+const TD = styled.td(`cursor: pointer;`);
+const FormCheck = styled(Form.Check)(`cursor: pointer;`);
+const TH = styled.th(`cursor: pointer; :hover { text-decoration: underline; }`);
 
 export default function Sales() {
   const isAdmin = useIsAdmin();
@@ -41,10 +45,6 @@ export default function Sales() {
       setSortOption((method + "-" + (direction === "up" ? "down" : "up")) as SortOption);
     else setSortOption((method + "-up") as SortOption);
   };
-
-  const TD = styled.td(`cursor: pointer;`);
-  const TH = styled.th(`cursor: pointer; :hover { text-decoration: underline; }`);
-  const FormCheck = styled(Form.Check)(`cursor: pointer;`);
 
   return !isAdmin ? null : (
     <Container>
