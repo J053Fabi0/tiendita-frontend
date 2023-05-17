@@ -1,6 +1,4 @@
-import Sale from "../types/sale.type";
-
-const getTotal = (sale: Partial<Sale> & { quantity: number; product: { price: number } }) =>
-  sale.specialPrice ?? sale.quantity * (sale.product.price ?? 0);
+const getTotal = (sale: { quantity: number; product: { price: number }; specialPrice?: number }) =>
+  sale.quantity * (sale.specialPrice ?? sale.product.price ?? 0);
 
 export default getTotal;

@@ -13,6 +13,7 @@ import { usePerson } from "../../context/personContext";
 import { Fragment, MouseEventHandler, useEffect, useReducer, useRef } from "react";
 import { Modal, InputGroup, Button, Row, Col, ButtonGroup, Form } from "react-bootstrap";
 import useReducerNewSaleModal, { ACTIONS, getTimeInFormat } from "./useReducerNewSaleModal";
+import getTotal from "../../utils/getTotal";
 
 export default function useNewSaleModal(
   handleOnSubmit: (values: Values, product: Product) => any | Promise<any>,
@@ -157,15 +158,11 @@ export default function useNewSaleModal(
                       Total:{" "}
                       <code>
                         $
-                        {(() => {
-                          let total = 0;
-                          if (values.specialPriceExists)
-                            total = values.specialPriceTotal
-                              ? values.specialPrice
-                              : values.specialPrice * values.quantity;
-                          else total = values.quantity * state.product!.price;
-                          return total;
-                        })()}
+                        {getTotal({
+                          quantity: values.quantity,
+                          product: { price: state.product!.price },
+                          specialPrice: values.specialPriceExists ? values.specialPrice : undefined,
+                        })}
                       </code>
                     </p>
 
