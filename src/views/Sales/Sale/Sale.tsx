@@ -4,10 +4,12 @@ import Sale from "../../../types/sale.type";
 import addCero from "../../../utils/addCero";
 import { useParams } from "react-router-dom";
 import { useCallback, useState } from "react";
+import getTotal from "../../../utils/getTotal";
 import useLoadData from "../../../hooks/useLoadData";
 import useReactModal from "../../../hooks/useReactModal";
 import { useIsAdmin } from "../../../context/personContext";
 import useUpdateEffect from "../../../hooks/useUpdateEffect";
+import { numberWithCommas } from "../../../utils/numbersString";
 import useRedirectIfTrue from "../../../hooks/useRedirectIfTrue";
 import useGoBackOrNavigate from "../../../hooks/useGoBackOrNavigate";
 import { useSalesState, useReloadSales } from "../../../context/salesContext";
@@ -56,7 +58,7 @@ export default function SaleView() {
   const [dateString, setDateString] = useState(+date === 0 ? "" : getDateString(date));
   useUpdateEffect(() => setDateString(getDateString(date)), [date]);
 
-  const total = sale ? (sale.specialPrice ?? product?.price ?? 0) * sale.quantity : 0;
+  const total = sale ? getTotal(sale) : 0;
 
   const [deleting, setDeleting] = useState(false);
   const handleDelete = useCallback(async () => {
@@ -130,18 +132,22 @@ export default function SaleView() {
                 </tr>
                 <tr>
                   <th>Total</th>
-                  <td>${!product && !sale.specialPrice ? "Cargando..." : total}</td>
+                  <td>${!product && !sale.specialPrice ? "Cargando..." : numberWithCommas(total)}</td>
                 </tr>
                 <tr>
                   <th>Tarjeta</th>
                   <td>
-                    {sale.cash !== total ? (sale.cash === 0 ? "Todo" : `$${total - sale.cash} en efectivo`) : "No"}
+                    {sale.cash !== total
+                      ? sale.cash === 0
+                        ? "Todo"
+                        : `$${numberWithCommas(total - sale.cash)} en efectivo`
+                      : "No"}
                   </td>
                 </tr>
                 {typeof sale.specialPrice === "number" && (
                   <tr>
                     <th>Precio especial</th>
-                    <td>${sale.specialPrice} c/u</td>
+                    <td>${numberWithCommas(sale.specialPrice / sale.quantity)} c/u</td>
                   </tr>
                 )}
                 {sale.comment === undefined ? null : (

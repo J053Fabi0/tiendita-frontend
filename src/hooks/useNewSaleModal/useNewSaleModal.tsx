@@ -159,9 +159,13 @@ export default function useNewSaleModal(
                       <code>
                         $
                         {getTotal({
-                          quantity: values.quantity,
+                          quantity: values.specialPriceTotal ? 1 : values.quantity,
                           product: { price: state.product!.price },
-                          specialPrice: values.specialPriceExists ? values.specialPrice : undefined,
+                          specialPrice: values.specialPriceExists
+                            ? values.specialPriceTotal
+                              ? values.specialPrice
+                              : values.quantity * values.specialPrice
+                            : undefined,
                         })}
                       </code>
                     </p>

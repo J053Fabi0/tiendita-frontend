@@ -45,6 +45,7 @@ export default function Home() {
       });
     })();
 
+    console.dir(a);
     try {
       await http.post("/sale", a);
       await reloadProduct(product.id);
