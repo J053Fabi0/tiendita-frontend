@@ -24,7 +24,7 @@ export default function SearchBar({ setSearchQuery, delay = 200 }: Props) {
           onChange={(a) => setTempSearchQuery(a.target.value)}
         />
 
-        <SearchButton type="submit" variant="dark" onClick={search}>
+        <SearchButton type="submit" onClick={search}>
           <Search className="mb-1" />
         </SearchButton>
       </SearchContainer>

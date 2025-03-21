@@ -1,12 +1,13 @@
 import styled from "@emotion/styled";
 import { Button, Form, InputGroup } from "react-bootstrap";
 
-const SearchButton = styled(Button)(({ theme: { colors } }: any) => ({
+const SearchButton = styled(Button)(({ theme: { colors } }) => ({
+  "border": "none",
   "borderTopRightRadius": "50rem",
   "borderBottomRightRadius": "50rem",
-  "backgroundColor": colors.primary,
+  "backgroundColor": colors.buttonColor,
   ":hover": {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.buttonColor,
   },
 }));
 
