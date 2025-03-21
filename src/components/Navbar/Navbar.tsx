@@ -9,13 +9,14 @@ const LogoutButton = styled(Nav.Link)`
   font-weight: 500;
 `;
 
+const Title = styled(Navb.Brand)({ paddingBottom: "0.5rem" });
+
 interface Props {
   links: Array<{ path: string; title: string; onlyAdmins?: boolean }>;
 }
 function Navbar({ links, ...props }: Props) {
   const logout = useLogOut();
   const person = usePerson();
-  const Title = styled(Navb.Brand)({ paddingBottom: "0.5rem" });
 
   return person === null ? null : (
     <Navb expand="lg" {...props}>
