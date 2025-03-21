@@ -1,3 +1,4 @@
+import "./styles/App.scss";
 import theme from "./styles/theme";
 import Home from "./views/Home/Home";
 import { Navbar } from "./components";
