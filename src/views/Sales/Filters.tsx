@@ -28,9 +28,15 @@ const NoHoverToggle = styled(ToggleButton)(({ active }) => ({
   },
 }));
 
-const ButtonMarginLeft = styled(Button)({
-  marginLeft: "0.5rem",
-});
+const ButtonCircular = styled(Button)`
+  background-color: white !important;
+  border-radius: 50%;
+  border: 1px black solid;
+`;
+
+const ButtonMarginLeft = styled(ButtonCircular)`
+  margin-left: 0.5rem;
+`;
 
 export default function Filters() {
   const from = useFrom();
@@ -71,9 +77,9 @@ export default function Filters() {
             <CustomToggle eventKey="days">Día</CustomToggle>
             {!isAdmin ? null : <CustomToggle eventKey="persons">Personas</CustomToggle>}
 
-            <Button variant="light" onClick={() => reloadSales(true)}>
+            <ButtonCircular variant="light" onClick={() => reloadSales(true)}>
               {loadingSales ? <Spinner animation="border" size="sm" /> : <ArrowClockwise />}
-            </Button>
+            </ButtonCircular>
 
             <ButtonMarginLeft
               disabled={loadingSales}
