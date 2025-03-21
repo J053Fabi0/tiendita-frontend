@@ -1,7 +1,7 @@
 const colors = {
   primary: "#2b2b2b",
   secondary: "#FFE6B4",
-  buttonColor: "#3c85b7",
+  buttonColor: "#F50087",
   buttonText: "#fff",
 } as const;
 

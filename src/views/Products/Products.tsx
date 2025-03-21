@@ -2,6 +2,7 @@ import http from "../../http-common";
 import Card from "../../components/Card/Card";
 import Product from "../../types/product.type";
 import { PlusCircle } from "react-bootstrap-icons";
+import { ButtonColored } from "../../styles/mixins";
 import useReactModal from "../../hooks/useReactModal";
 import { Fragment, useCallback, useState } from "react";
 import { useIsAdmin } from "../../context/personContext";
@@ -92,9 +93,9 @@ export default function Products() {
       <Container>
         <Row className="mt-3">
           <Col className="d-flex justify-content-center">
-            <Button className="d-flex align-items-center" onClick={() => setShowNewProduct(true)}>
+            <ButtonColored className="d-flex align-items-center" onClick={() => setShowNewProduct(true)}>
               <PlusCircle /> &nbsp;Nuevo producto
-            </Button>
+            </ButtonColored>
           </Col>
         </Row>
 
