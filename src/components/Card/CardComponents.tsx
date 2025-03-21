@@ -20,12 +20,12 @@ const Container = styled(
   },
 }));
 
-const CardComponentM = styled(CardComponent)(({ theme: { colors } }: any) => ({
+const CardComponentM = styled(CardComponent)(({ theme }) => ({
   "width": "100%",
   "height": "100%",
   "cursor": "pointer",
   "flexDirection": "row",
-  ":hover": { borderColor: colors.primary },
+  ":hover": { borderColor: theme.colors.primary },
   "@media (max-width: 767px)": { flexDirection: "column", height: "auto" },
 }));
 
@@ -34,7 +34,7 @@ const maxLines = 1;
 
 const Price = styled(({ className, children }: StyledProp) => (
   <CardComponent.Text className={className + " mb-0"}>{children}</CardComponent.Text>
-))(() => ({
+))({
   "overflow": "hidden",
   "display": "-webkit-box",
   "textOverflow": "ellipsis",
@@ -48,7 +48,7 @@ const Price = styled(({ className, children }: StyledProp) => (
     maxHeight: lineHeight * maxLines + "em",
   },
   "@media (max-width: 767px)": { WebkitLineClamp: maxLines, height: "auto" },
-}));
+});
 
 const BadgesDiv = styled.div`
   height: 33px; // 25.5

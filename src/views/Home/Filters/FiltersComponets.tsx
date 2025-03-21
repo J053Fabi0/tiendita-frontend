@@ -2,7 +2,7 @@ import styled from "@emotion/styled";
 import { Col } from "react-bootstrap";
 import StyledProp from "../../../types/styledProp.type";
 
-const FiltersBar = styled.div(({ theme: { colors } }: any) => ({
+const FiltersBar = styled.div(({ theme: { colors } }) => ({
   "backgroundColor": colors.secondary,
   "display": "flex",
   "flexDirection": "column",

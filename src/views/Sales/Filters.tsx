@@ -164,6 +164,7 @@ export default function Filters() {
                 ) : (
                   [
                     <NoHoverToggle
+                      id="all"
                       value=""
                       key="all"
                       type="checkbox"
@@ -180,6 +181,7 @@ export default function Filters() {
                         key={id}
                         value=""
                         type="checkbox"
+                        id={id.toString()}
                         className="me-2 mb-2"
                         variant="outline-secondary"
                         active={selectedPersons.includes(id)}
